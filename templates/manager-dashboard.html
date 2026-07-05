@@ -969,7 +969,6 @@
                 flex-shrink: 0;
             }
             
-            /* FIXED: Buttons on mobile - ICON ONLY VERSION */
             .btn {
                 width: auto;
                 justify-content: center;
@@ -988,7 +987,6 @@
                 font-size: 18px;
             }
             
-            /* NEW: Add icon button styling */
             .add-icon-btn {
                 width: 44px;
                 height: 44px;
@@ -1260,14 +1258,12 @@
             margin-bottom: 5px;
         }
         
-        /* FIXED: Action buttons in table */
         .action-buttons {
             display: flex;
             gap: 8px;
             flex-wrap: nowrap;
         }
         
-        /* FIXED: Small screens button text */
         @media (max-width: 480px) {
             .btn-text {
                 font-size: 13px;
@@ -1289,7 +1285,6 @@
             }
         }
         
-        /* FIXED: For larger phones (481px - 768px) */
         @media (min-width: 481px) and (max-width: 768px) {
             .section-header {
                 flex-direction: row;
@@ -1491,7 +1486,7 @@
             </div>
         </div>
         
-        <!-- Waiters Section - FIXED -->
+        <!-- Waiters Section -->
         <div id="waiters" class="content-section">
             <div class="section">
                 <div class="section-header">
@@ -1722,7 +1717,7 @@
         </div>
     </div>
     
-    <!-- Add/Edit Waiter Modal - FIXED -->
+    <!-- Add/Edit Waiter Modal -->
     <div id="waiterModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -2324,8 +2319,6 @@
             };
             reader.readAsDataURL(file);
         }
-        
-        // ========== FIXED WAITER FUNCTIONS ==========
         
         // Load waiters with proper field mapping
         async function loadWaiters() {
