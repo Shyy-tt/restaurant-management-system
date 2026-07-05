@@ -650,7 +650,6 @@
                 const fetchedOrders = await response.json();
                 console.log('Chef: Received', fetchedOrders.length, 'orders');
                 
-                // DEBUG: Log all statuses
                 fetchedOrders.forEach(order => {
                     console.log(`Order ${order.id}: Status=${order.status}, Table=${order.table_number || order.table}, Date=${order.timestamp || order.order_date}`);
                 });
@@ -929,7 +928,7 @@
             `;
         }
         
-        // Start cooking an order - FIXED
+        // Start cooking an order
         async function startCooking(orderId) {
             try {
                 console.log(`Chef: Starting cooking for order ${orderId}...`);
@@ -969,7 +968,7 @@
             }
         }
         
-        // Mark order as done (ready to serve) - FIXED
+        // Mark order as done (ready to serve)
         async function markAsDone(orderId) {
             try {
                 console.log(`Chef: Marking order ${orderId} as ready...`);
