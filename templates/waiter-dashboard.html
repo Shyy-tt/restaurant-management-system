@@ -179,7 +179,6 @@
             50% { opacity: 1; transform: scale(1.2); }
         }
 
-        /* FIXED: Button container for menu section */
         .menu-header-buttons {
             display: grid;
             grid-template-columns: auto 1fr auto;
@@ -190,7 +189,6 @@
             margin-bottom: 20px;
         }
 
-        /* FIXED: View Order Button */
         .view-order-btn {
             background: var(--warning);
             color: white;
@@ -235,8 +233,6 @@
             align-items: center;
             gap: 5px;
         }
-
-        /* FIXED: Back to Tables Button - ICON ONLY VERSION */
         .back-to-tables-btn-icon {
             background: var(--primary);
             color: white;
@@ -361,8 +357,6 @@
             background: var(--primary);
             color: white;
         }
-
-        /* FIXED: Responsive Tables Grid */
         .tables-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -370,7 +364,6 @@
             padding: 10px;
         }
 
-        /* FIXED: Table Card Design */
         .table-card {
             position: relative;
             cursor: pointer;
@@ -566,7 +559,6 @@
             transform: rotate(180deg);
         }
 
-        /* UPDATED: Chair positions - 8-10p table - BETTER SPACING, MOVED CLOSER */
         .chairs-8-rect .chair:nth-child(1) { 
             top: -4px;
             left: 8%;
@@ -1221,7 +1213,6 @@
             border-color: var(--light) !important;
         }
         
-        /* NEW: For View Order buttons */
         .order-summary-item .quantity-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -3591,7 +3582,6 @@
                     return;
                 }
                 
-                // ✅ FIX: This is what triggers cashier notification
                 // Set bill_requested = 1, status remains 'served'
                 const updateResponse = await fetch(`/api/orders/${tableOrder.id}/status`, {
                     method: 'PUT',
