@@ -62,3 +62,25 @@ This project simulates a real-world restaurant workflow with role-based access f
 
   ### Mobile
     * Android Studio (Java/Kotlin)
+
+# Getting Started (Web)
+
+    # Clone the repo
+    git clone https://github.com/Shyy-tt/restaurant-management-system.git
+    cd restaurant-management-system
+
+    # Set up virtual environment
+    python -m venv venv
+    venv\Scripts\activate   # Windows
+
+    # Install dependencies
+    pip install -r requirements.txt
+
+    # Run the server
+    python server.py
+
+Server runs at http://localhost:5000
+
+# Mobile App
+   See /mobile-app for the Android Studio project — open it directly in Android Studio to build and run.
+
