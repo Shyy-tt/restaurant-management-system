@@ -30,7 +30,6 @@ def add_customer_count_column():
 init_db()
 add_customer_count_column()
 
-# IMPORTANT: Set Philippine timezone
 PH_TIMEZONE = timezone(timedelta(hours=8))  # UTC+8 for Philippines
 
 def row_to_dict(row):
@@ -70,7 +69,6 @@ def validate_image_data(image_data):
     
     return image_data
 
-# ========== FIXED: TIME FUNCTIONS ==========
 
 def get_philippine_time():
     """Get current Philippine time (UTC+8)"""
@@ -222,7 +220,6 @@ def waiter_dashboard():
         return redirect(url_for('home'))
     return render_template('waiter-dashboard.html', username=session.get('name'))
 
-# ========== IMPORTANT: ADD THIS NEW ENDPOINT ==========
 
 @app.route('/api/time', methods=['GET'])
 def get_server_time():
@@ -391,7 +388,6 @@ def delete_dish(dish_id):
     
     return jsonify({"success": True})
 
-# ========== FIXED WAITER ENDPOINTS ==========
 
 @app.route('/api/waiters', methods=['GET'])
 def get_waiters():
@@ -689,7 +685,6 @@ def debug_waiters():
         }
     })
 
-# ========== FIXED: TABLES ENDPOINT ==========
 
 @app.route('/api/tables', methods=['GET'])
 def get_tables():
@@ -713,7 +708,6 @@ def get_tables():
         for row in cursor.fetchall():
             table = row_to_dict(row)
             
-            # FIX: Add duration_minutes calculation
             if table['status'] == 'occupied' and table.get('occupied_since'):
                 table['duration_minutes'] = calculate_duration_minutes(table['occupied_since'])
             else:
@@ -727,8 +721,6 @@ def get_tables():
         print(f"Error getting tables: {e}")
         traceback.print_exc()
         return jsonify([])
-
-# ========== FIXED: UPDATE TABLE STATUS ==========
 
 @app.route('/api/tables/<int:table_number>/status', methods=['PUT'])
 def update_table_status(table_number):
@@ -796,7 +788,6 @@ def get_orders():
     if user_role == 'chef':
         cursor.execute('SELECT * FROM orders WHERE status IN ("pending", "preparing", "served") ORDER BY order_date DESC')
     elif user_role == 'cashier':
-        # FIXED: Only show orders where bill_requested = 1
         cursor.execute('SELECT * FROM orders WHERE bill_requested = 1 AND status != "completed" ORDER BY order_date DESC')
     elif user_role == 'waiter':
         waiter_name = session.get('name')
@@ -863,7 +854,6 @@ def get_single_order(order_id):
         print(f"Error getting order: {e}")
         return jsonify({"success": False, "message": str(e)}), 500
 
-# ========== FIXED: CREATE ORDER ==========
 
 @app.route('/api/orders', methods=['POST'])
 def create_order():
@@ -964,7 +954,6 @@ def update_order_status(order_id):
         update_fields = ["status = ?"]
         values = [data['status']]
         
-        # ✅ CRITICAL FIX: Chef marking as ready should NOT set bill_requested
         # Only when waiter explicitly requests bill
         if 'bill_requested' in data:
             update_fields.append("bill_requested = ?")
@@ -1275,7 +1264,6 @@ def get_pending_bills():
     cursor = conn.cursor()
     
     try:
-        # ✅ FIXED: Only show orders where bill_requested = 1
         # NOT all 'served' orders
         cursor.execute('''
             SELECT * FROM orders 
@@ -1377,7 +1365,6 @@ def get_order_details(order_id):
         print(f"Error getting order details: {e}")
         return jsonify({"success": False, "message": str(e)}), 500
 
-# ========== CRITICAL FIX: PROCESS PAYMENT (clears table) ==========
 
 @app.route('/api/cashier/process-payment/<int:order_id>', methods=['POST'])
 def process_payment(order_id):
@@ -1440,7 +1427,6 @@ def process_payment(order_id):
             except Exception as e:
                 pass
         
-        # ✅ CRITICAL FIX: Always clear the table when payment is processed
         cursor.execute('''
             UPDATE restaurant_tables 
             SET status = 'available', 
