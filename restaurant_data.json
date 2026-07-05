@@ -1,0 +1,39 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "manager",
+      "password": "admin123",
+      "role": "manager",
+      "name": "Admin Manager",
+      "status": "active"
+    },
+    {
+      "id": 2,
+      "username": "chef",
+      "password": "chef123",
+      "role": "chef",
+      "name": "Head Chef",
+      "status": "active"
+    },
+    {
+      "id": 3,
+      "username": "cashier",
+      "password": "cashier123",
+      "role": "cashier",
+      "name": "Main Cashier",
+      "status": "active"
+    },
+    {
+      "id": 4,
+      "username": "john",
+      "password": "waiter123",
+      "role": "waiter",
+      "name": "John Waiter",
+      "status": "active"
+    }
+  ],
+  "waiters": [],
+  "dishes": [],
+  "orders": []
+}

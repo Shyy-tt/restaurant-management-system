@@ -1,0 +1,3797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Waiter Dashboard - Restaurant Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* UNIQUE MODERN DESIGN */
+        :root {
+            --primary: #6C63FF;
+            --secondary: #4A44C6;
+            --accent: #FF6584;
+            --success: #2FD67A;
+            --warning: #FFC145;
+            --danger: #FF6B6B;
+            --light: #F8F9FF;
+            --dark: #2D2B55;
+            --gray: #8A8DB3;
+            --glass: rgba(255, 255, 255, 0.1);
+            --shadow: 0 8px 32px rgba(106, 99, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Inter', -apple-system, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 15px;
+            padding-bottom: 20px;
+            color: var(--dark);
+        }
+
+        /* UNIQUE GLASSMORPHISM HEADER */
+        .header {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 22px;
+            font-weight: 800;
+            color: white;
+        }
+
+        .logo-icon img {
+            width: 120%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* LOGOUT BUTTON - TOP RIGHT */
+        .logout-btn {
+            background: rgba(255, 107, 107, 0.2);
+            border: 2px solid var(--danger);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logout-btn:hover {
+            background: var(--danger);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        /* WAITER INFO SECTION - CLICKABLE FOR PROFILE */
+        .waiter-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .waiter-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 15px;
+            transition: all 0.3s;
+        }
+
+        .waiter-info:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .waiter-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .waiter-details {
+            color: white;
+        }
+
+        .waiter-details h2 {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        /* AUTO-REFRESH INDICATOR */
+        .refresh-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 5s infinite;
+            display: none;
+        }
+
+        .refresh-indicator.active {
+            display: block;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* FIXED: Button container for menu section */
+        .menu-header-buttons {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            width: 100%;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        /* FIXED: View Order Button */
+        .view-order-btn {
+            background: var(--warning);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 15px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(255, 193, 69, 0.6);
+            display: none;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            white-space: nowrap;
+            width: auto;
+            min-width: 120px;
+            max-width: 180px;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .view-order-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 193, 69, 0.8);
+        }
+
+        .view-order-btn .badge {
+            background: var(--danger);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            min-width: 24px;
+        }
+
+        /* TIME DISPLAY */
+        .time-display {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* FIXED: Back to Tables Button - ICON ONLY VERSION */
+        .back-to-tables-btn-icon {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
+            transition: all 0.3s;
+            flex-shrink: 0;
+            font-size: 20px;
+            padding: 0;
+        }
+
+        .back-to-tables-btn-icon:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(108, 99, 255, 0.4);
+            background: var(--secondary);
+        }
+
+        .back-to-tables-btn-icon .btn-text {
+            display: none;
+        }
+
+        /* For very small screens */
+        @media (max-width: 360px) {
+            .back-to-tables-btn-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+        }
+
+        /* For tablets */
+        @media (min-width: 481px) and (max-width: 768px) {
+            .back-to-tables-btn-icon {
+                width: 45px;
+                height: 45px;
+            }
+        }
+
+        /* UNIQUE TABLE GRID */
+        .tables-container {
+            background: var(--light);
+            border-radius: 25px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title h3 {
+            color: var(--dark);
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .refresh-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .refresh-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .refresh-btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .refresh-btn .fa-spin {
+            animation: fa-spin 1s linear infinite;
+        }
+
+        .table-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            background: white;
+            color: var(--gray);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* FIXED: Responsive Tables Grid */
+        .tables-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            padding: 10px;
+        }
+
+        /* FIXED: Table Card Design */
+        .table-card {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 140px;
+            border-radius: 15px;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 180px;
+            margin: 0 auto;
+        }
+
+        .table-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Table with chairs layout */
+        .table-visual {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px auto;
+        }
+
+        /* Central table - UPDATED FOR DIFFERENT SIZES */
+        .table-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 800;
+            z-index: 2;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        /* Small tables (3-5p) */
+        .table-card:not(.medium-table):not(.large-table):not(.xlarge-table) .table-center {
+            width: 60px;
+            height: 60px;
+        }
+
+        /* Medium tables (4-6p) */
+        .table-card.medium-table .table-center {
+            width: 65px;
+            height: 55px;
+        }
+
+        /* Large tables (6-8p) - RECTANGULAR */
+        .table-card.large-table .table-center {
+            width: 100px;
+            height: 60px;
+        }
+
+        /* Extra large tables (8-10p, 10-12p) */
+        .table-card.xlarge-table .table-center {
+            width: 120px;
+            height: 60px;
+        }
+
+        /* Available table - LIGHT GRAY */
+        .table-card.available .table-center {
+            background: #F5F5F5;
+            color: #666;
+            border: 2px solid #E0E0E0;
+        }
+
+        /* Occupied table - DARK GRAY */
+        .table-card.occupied .table-center {
+            background: #867d7d;
+            color: white;
+            border: 2px solid #333;
+        }
+
+        /* Chair circles around table - UPDATED: MOVED CLOSER TO TABLE */
+        .chair {
+            position: absolute;
+            width: 16px;
+            height: 8px;
+            border-radius: 8px 8px 0 0;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .table-card.available .chair {
+            background: #D0D0D0;
+            border: 1px solid #B0B0B0;
+        }
+
+        .table-card.occupied .chair {
+            background: #666666;
+            border: 1px solid #555;
+        }
+
+        /* Hover effects */
+        .table-card:hover .table-center {
+            transform: scale(1.05);
+        }
+
+        .table-card:hover .chair {
+            transform: translateY(-1px);
+        }
+
+        /* Chair positions - 4 person table (3-5p) - MOVED CLOSER */
+        .chairs-4 .chair:nth-child(1) { 
+            top: 2px;
+            left: 30%;
+        }
+        .chairs-4 .chair:nth-child(2) { 
+            top: 2px;
+            right: 30%;
+        }
+        .chairs-4 .chair:nth-child(3) { 
+            bottom: 2px;
+            left: 30%;
+            transform: rotate(180deg);
+        }
+        .chairs-4 .chair:nth-child(4) { 
+            bottom: 2px;
+            right: 30%;
+            transform: rotate(180deg);
+        }
+
+        /* Chair positions - 6 person table (4-6p) - 2 top, 2 bottom, 2 sides - MOVED CLOSER */
+        .chairs-6-sides .chair:nth-child(1) { 
+            top: 4px;
+            left: 30%;
+        }
+        .chairs-6-sides .chair:nth-child(2) { 
+            top: 4px;
+            right: 30%;
+        }
+        .chairs-6-sides .chair:nth-child(3) { 
+            left: -4px;
+            top: 30%;
+            transform: rotate(-90deg);
+        }
+        .chairs-6-sides .chair:nth-child(4) { 
+            left: -4px;
+            bottom: 30%;
+            transform: rotate(-90deg);
+        }
+        .chairs-6-sides .chair:nth-child(5) { 
+            right: -4px;
+            top: 30%;
+            transform: rotate(90deg);
+        }
+        .chairs-6-sides .chair:nth-child(6) { 
+            right: -4px;
+            bottom: 30%;
+            transform: rotate(90deg);
+        }
+
+        /* Chair positions - 6-8p table - RECTANGULAR with 3 chairs top/bottom - MOVED CLOSER */
+        .chairs-6-rect .chair:nth-child(1) { 
+            top: -2px;
+            left: 15%;
+        }
+        .chairs-6-rect .chair:nth-child(2) { 
+            top: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .chairs-6-rect .chair:nth-child(3) { 
+            top: -2px;
+            right: 15%;
+        }
+        .chairs-6-rect .chair:nth-child(4) { 
+            bottom: -2px;
+            left: 15%;
+            transform: rotate(180deg);
+        }
+        .chairs-6-rect .chair:nth-child(5) { 
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%) rotate(180deg);
+        }
+        .chairs-6-rect .chair:nth-child(6) { 
+            bottom: -2px;
+            right: 15%;
+            transform: rotate(180deg);
+        }
+
+        /* UPDATED: Chair positions - 8-10p table - BETTER SPACING, MOVED CLOSER */
+        .chairs-8-rect .chair:nth-child(1) { 
+            top: -4px;
+            left: 8%;
+        }
+        .chairs-8-rect .chair:nth-child(2) { 
+            top: -4px;
+            left: 30%;
+        }
+        .chairs-8-rect .chair:nth-child(3) { 
+            top: -4px;
+            right: 30%;
+        }
+        .chairs-8-rect .chair:nth-child(4) { 
+            top: -4px;
+            right: 8%;
+        }
+        .chairs-8-rect .chair:nth-child(5) { 
+            bottom: -4px;
+            left: 8%;
+            transform: rotate(180deg);
+        }
+        .chairs-8-rect .chair:nth-child(6) { 
+            bottom: -4px;
+            left: 30%;
+            transform: rotate(180deg);
+        }
+        .chairs-8-rect .chair:nth-child(7) { 
+            bottom: -4px;
+            right: 30%;
+            transform: rotate(180deg);
+        }
+        .chairs-8-rect .chair:nth-child(8) { 
+            bottom: -4px;
+            right: 8%;
+            transform: rotate(180deg);
+        }
+
+        /* Table info section */
+        .table-info {
+            text-align: center;
+            width: 100%;
+        }
+
+        .table-number {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+
+        .table-capacity {
+            font-size: 12px;
+            color: var(--gray);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .table-status {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            letter-spacing: 0.5px;
+        }
+
+        .status-available { 
+            background: #E8F5E9; 
+            color: #2E7D32;
+            border: 1px solid #C8E6C9;
+        }
+        
+        .status-occupied { 
+            background: #FFF3E0; 
+            color: #EF6C00;
+            border: 1px solid #FFE0B2;
+        }
+
+        .table-time {
+            font-size: 10px;
+            color: var(--gray);
+            margin-top: 5px;
+            font-style: italic;
+            min-height: 14px;
+        }
+
+        /* STATS IN PROFILE SECTION */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        /* MODAL DESIGN */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 30px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            padding: 25px;
+            border-bottom: 2px solid var(--light);
+            position: relative;
+        }
+
+        .modal-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            border-radius: 30px 30px 0 0;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .modal-header h3 {
+            color: var(--dark);
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: var(--light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--gray);
+            transition: all 0.3s;
+        }
+
+        .close-modal:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        /* UNIQUE FORM ELEMENTS */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--light);
+            border-radius: 15px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
+        }
+
+        .customer-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .customer-btn {
+            padding: 15px;
+            border: 2px solid var(--light);
+            background: white;
+            border-radius: 15px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .customer-btn:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .customer-btn.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* UNIQUE BUTTONS */
+        .btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 15px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(108, 99, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+            box-shadow: 0 4px 15px rgba(47, 214, 122, 0.3);
+        }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        /* ORDER ITEMS LIST */
+        .order-items {
+            margin: 20px 0;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: var(--light);
+            border-radius: 15px;
+            margin-bottom: 10px;
+        }
+
+        .item-info h4 {
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+
+        .item-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .qty-btn {
+            width: 30px;
+            height: 30px;
+            background: white;
+            border: 2px solid var(--light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .qty-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* MENU CATEGORIES GRID */
+        .menu-categories-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: 2px solid transparent;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: var(--primary);
+        }
+
+        .category-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin: 0 auto 15px auto;
+        }
+
+        .category-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+
+        .category-count {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        /* MENU ITEMS PAGE */
+        .menu-items-page {
+            display: none;
+        }
+
+        .menu-items-page.active {
+            display: block;
+        }
+
+        .menu-items-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .back-btn {
+            padding: 10px 20px;
+            background: var(--light);
+            border: none;
+            border-radius: 15px;
+            color: var(--dark);
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateX(-5px);
+        }
+
+        .menu-items-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .menu-item-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+        }
+
+        .menu-item-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .menu-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .menu-item-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+
+        .menu-item-price {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .menu-item-description {
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .menu-item-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: var(--light);
+            border-radius: 15px;
+            padding: 10px 15px;
+        }
+
+        .quantity-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: none;
+            background: white;
+            color: var(--dark);
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .quantity-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .quantity-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .quantity-btn:disabled:hover {
+            background: white;
+            color: var(--dark);
+        }
+
+        .quantity-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark);
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .add-item-btn {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .add-item-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 99, 255, 0.4);
+        }
+
+        .add-item-btn.added {
+            background: var(--success);
+        }
+
+        /* CURRENT ORDER PAGE */
+        .current-order-page {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .current-order-page.active {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        .current-order-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .order-summary {
+            background: var(--light);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .order-summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border-radius: 15px;
+            margin-bottom: 10px;
+        }
+
+        .order-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .order-total-section {
+            text-align: right;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid var(--light);
+        }
+
+        .total-amount {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        /* NEW: Better button feedback */
+        .quantity-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .quantity-btn:disabled:hover {
+            background: white !important;
+            color: var(--dark) !important;
+            border-color: var(--light) !important;
+        }
+        
+        /* NEW: For View Order buttons */
+        .order-summary-item .quantity-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .order-summary-item .quantity-btn:disabled:hover {
+            background: white !important;
+            color: var(--dark) !important;
+            border-color: var(--light) !important;
+        }
+        
+        /* Modal scrollable area */
+        .modal-scrollable {
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        /* Custom scrollbar */
+        .modal-scrollable::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-scrollable::-webkit-scrollbar-track {
+            background: var(--light);
+            border-radius: 10px;
+        }
+
+        .modal-scrollable::-webkit-scrollbar-thumb {
+            background: var(--gray);
+            border-radius: 10px;
+        }
+
+        .modal-scrollable::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        /* ORDER REVIEW ITEMS */
+        .order-review-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid var(--light);
+            transition: all 0.3s;
+        }
+
+        .order-review-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .special-notes {
+            background: #FFF9E6;
+            border-left: 4px solid var(--warning);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* KITCHEN NOTIFICATION */
+        .kitchen-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(47, 214, 122, 0.4);
+            z-index: 1001;
+            animation: slideInRight 0.5s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* AUTO-REFRESH NOTIFICATION */
+        .auto-refresh-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(46, 204, 113, 0.9);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 13px;
+            z-index: 999;
+            animation: fadeInOut 4s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(10px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(10px); }
+        }
+
+        @keyframes fa-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Add this to the existing CSS */
+        .menu-item-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 12px;
+            object-fit: cover;
+            margin-right: 15px;
+            border: 2px solid var(--light);
+        }
+
+        .menu-item-image.emoji {
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .menu-item-header-with-image {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .menu-item-content {
+            flex: 1;
+        }
+
+        /* ANIMATIONS */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* LOADING SPINNER */
+        .spinner {
+            border: 4px solid var(--light);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* NOTIFICATION BADGE */
+        .badge-circle {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* RESPONSIVE DESIGN - UPDATED */
+        /* Mobile phones */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+                padding-bottom: 15px;
+            }
+            
+            .header {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+            
+            .logo {
+                font-size: 16px;
+            }
+            
+            .logo-icon {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .logout-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+            
+            .waiter-avatar {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+            
+            .waiter-details h2 {
+                font-size: 16px;
+            }
+            
+            .tables-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .table-card {
+                min-height: 120px;
+                padding: 10px;
+                max-width: 160px;
+            }
+            
+            .table-visual {
+                width: 70px;
+                height: 70px;
+            }
+            
+            .table-card:not(.medium-table):not(.large-table):not(.xlarge-table) .table-center {
+                width: 50px;
+                height: 50px;
+                font-size: 18px;
+            }
+            
+            .table-card.medium-table .table-center {
+                width: 55px;
+                height: 45px;
+                font-size: 18px;
+            }
+            
+            .chair {
+                width: 12px;
+                height: 6px;
+            }
+            
+            .menu-categories-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .category-card {
+                padding: 15px;
+            }
+            
+            .category-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 30px;
+            }
+            
+            .menu-items-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .menu-item-card {
+                padding: 15px;
+            }
+            
+            .view-order-btn {
+                min-width: 100px;
+                padding: 8px 12px;
+                font-size: 12px;
+                flex: 1;
+                max-width: 140px;
+            }
+            
+            .view-order-btn .badge {
+                font-size: 10px;
+                padding: 2px 6px;
+                min-width: 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+            
+            .stat-card {
+                padding: 10px;
+            }
+            
+            .stat-value {
+                font-size: 16px;
+            }
+            
+            .refresh-controls {
+                flex-direction: column;
+                gap: 5px;
+                align-items: flex-end;
+            }
+            
+            .refresh-btn {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+            
+            /* Hide button text on very small screens */
+            @media (max-width: 360px) {
+                .btn-text {
+                    display: none;
+                }
+                
+                .view-order-btn {
+                    min-width: 40px;
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    justify-content: center;
+                    padding: 0;
+                }
+                
+                .view-order-btn .badge {
+                    position: absolute;
+                    top: -5px;
+                    right: -5px;
+                }
+            }
+        }
+
+        /* Tablets */
+        @media (min-width: 481px) and (max-width: 768px) {
+            .tables-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 12px;
+            }
+            
+            .table-card {
+                min-height: 130px;
+                max-width: 170px;
+            }
+            
+            .table-visual {
+                width: 85px;
+                height: 85px;
+            }
+            
+            .menu-categories-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .menu-items-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .view-order-btn {
+                min-width: 110px;
+                padding: 9px 14px;
+                font-size: 13px;
+            }
+        }
+
+        /* Desktop */
+        @media (min-width: 769px) {
+            .tables-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 20px;
+            }
+            
+            .menu-categories-grid {
+                grid-template-columns: repeat(3, 2fr);
+            }
+            
+            .menu-items-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Large Desktop */
+        @media (min-width: 1200px) {
+            .tables-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+            
+            .menu-categories-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .menu-items-container {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="header">
+        <div class="refresh-indicator" id="refreshIndicator" title="Auto-refresh active (5 seconds)"></div>
+        <div class="header-top">
+            <div class="logo">
+                <div class="logo-icon">
+                    <img src="/static/images/logo.png">
+                </div>
+                <span>LASA RESTAURANT</span>
+            </div>
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+
+        <!-- WAITER INFO SECTION - CLICKABLE FOR PROFILE -->
+        <div class="waiter-section">
+            <div class="waiter-info" onclick="showProfile()">
+                <div class="waiter-avatar">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <div class="waiter-details">
+                    <h2 id="waiterName">Waiter: {{ username }}</h2>
+                    <div class="time-display">
+                        <i class="fas fa-clock"></i>
+                        <span id="currentTime">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABLES SECTION - DEFAULT VIEW -->
+    <div class="tables-container" id="tablesSection">
+        <div class="section-title">
+            <h3><i class="fas fa-utensils"></i> Table Selection</h3>
+            <div class="refresh-controls">
+                <button class="refresh-btn" onclick="forceRefreshTables()">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <div class="time-display" style="font-size: 12px;">
+                    <span id="lastRefreshTime">Never refreshed</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-filters">
+            <button class="filter-btn active" onclick="filterTables('all')">All Tables</button>
+            <button class="filter-btn" onclick="filterTables('available')">Available</button>
+            <button class="filter-btn" onclick="filterTables('occupied')">Occupied</button>
+        </div>
+
+        <div class="tables-grid" id="tablesGrid">
+            <!-- Tables will be loaded here -->
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <!-- MENU SECTION (HIDDEN BY DEFAULT) -->
+    <div class="tables-container" id="menuSection" style="display: none; position: relative;">
+        <!-- FIXED: Header with responsive buttons -->
+        <div class="menu-header-buttons">
+            <!-- Left: Back to Tables - ICON ONLY -->
+            <button class="back-to-tables-btn-icon" onclick="backToTables()" title="Back to Tables">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            
+            <!-- Center: Menu Title -->
+            <div>
+                <h3 style="color: var(--dark); font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0;">
+                    <i class="fas fa-book-open"></i> <span>Menu</span>
+                </h3>
+                <div id="currentOrderInfo" style="font-size: 12px; color: var(--primary); font-weight: 600; margin-top: 3px;text-align: center;">
+                    <!-- Will be populated with table info -->
+                </div>
+            </div>
+            
+            <!-- Right: View Order -->
+            <button class="view-order-btn" id="viewOrderBtn" onclick="openCurrentOrder()" style="display: none;">
+                <i class="fas fa-clipboard-list"></i> 
+                <span class="btn-text">View Order</span>
+                <span class="badge" id="orderBadge">0</span>
+            </button>
+        </div>
+
+        <!-- CATEGORIES PAGE -->
+        <div id="categoriesPage" class="menu-categories-page">
+            <div class="menu-categories-grid">
+                <div class="category-card" onclick="openCategory('appetizer')">
+                    <div class="category-icon">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <div class="category-name">APPETIZER</div>
+                    <div class="category-count" id="appetizerCount">Loading...</div>
+                </div>
+                
+                <div class="category-card" onclick="openCategory('main')">
+                    <div class="category-icon">
+                        <i class="fas fa-drumstick-bite"></i>
+                    </div>
+                    <div class="category-name">MAIN DISH</div>
+                    <div class="category-count" id="mainCount">Loading...</div>
+                </div>
+                
+                <div class="category-card" onclick="openCategory('lasa')">
+                    <div class="category-icon">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <div class="category-name">LASA SPECIALTY</div>
+                    <div class="category-count" id="lasaCount">Loading...</div>
+                </div>
+                
+                <div class="category-card" onclick="openCategory('side')">
+                    <div class="category-icon">
+                        <i class="fas fa-carrot"></i>
+                    </div>
+                    <div class="category-name">SIDE DISH</div>
+                    <div class="category-count" id="sideCount">Loading...</div>
+                </div>
+                
+                <div class="category-card" onclick="openCategory('dessert')">
+                    <div class="category-icon">
+                        <i class="fas fa-ice-cream"></i>
+                    </div>
+                    <div class="category-name">DESSERT</div>
+                    <div class="category-count" id="dessertCount">Loading...</div>
+                </div>
+                
+                <div class="category-card" onclick="openCategory('beverage')">
+                    <div class="category-icon">
+                        <i class="fas fa-glass-cheers"></i>
+                    </div>
+                    <div class="category-name">BEVERAGES</div>
+                    <div class="category-count" id="beverageCount">Loading...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MENU ITEMS PAGES (HIDDEN BY DEFAULT) -->
+        <div id="appetizerPage" class="menu-items-page">
+            <div class="menu-items-header">
+                <button class="back-btn" onclick="backToCategories()">
+                    <i class="fas fa-arrow-left"></i> Back to Categories
+                </button>
+                <h3>APPETIZER</h3>
+            </div>
+            <div class="menu-items-container" id="appetizerItems">
+                <div class="spinner"></div>
+            </div>
+        </div>
+
+        <div id="mainPage" class="menu-items-page">
+            <div class="menu-items-header">
+                <button class="back-btn" onclick="backToCategories()">
+                    <i class="fas fa-arrow-left"></i> Back to Categories
+                </button>
+                <h3>MAIN DISH</h3>
+            </div>
+            <div class="menu-items-container" id="mainItems">
+                <div class="spinner"></div>
+            </div>
+        </div>
+
+        <div id="lasaPage" class="menu-items-page">
+            <div class="menu-items-header">
+                <button class="back-btn" onclick="backToCategories()">
+                    <i class="fas fa-arrow-left"></i> Back to Categories
+                </button>
+                <h3>LASA SPECIALTY</h3>
+            </div>
+            <div class="menu-items-container" id="lasaItems">
+                <div class="spinner"></div>
+            </div>
+        </div>
+
+        <div id="sidePage" class="menu-items-page">
+            <div class="menu-items-header">
+                <button class="back-btn" onclick="backToCategories()">
+                    <i class="fas fa-arrow-left"></i> Back to Categories
+                </button>
+                <h3>SIDE DISH</h3>
+            </div>
+            <div class="menu-items-container" id="sideItems">
+                <div class="spinner"></div>
+            </div>
+        </div>
+
+        <div id="dessertPage" class="menu-items-page">
+            <div class="menu-items-header">
+                <button class="back-btn" onclick="backToCategories()">
+                    <i class="fas fa-arrow-left"></i> Back to Categories
+                </button>
+                <h3>DESSERT</h3>
+            </div>
+            <div class="menu-items-container" id="dessertItems">
+                <div class="spinner"></div>
+            </div>
+        </div>
+
+        <div id="beveragePage" class="menu-items-page">
+            <div class="menu-items-header">
+                <button class="back-btn" onclick="backToCategories()">
+                    <i class="fas fa-arrow-left"></i> Back to Categories
+                </button>
+                <h3>BEVERAGES</h3>
+            </div>
+            <div class="menu-items-container" id="beverageItems">
+                <div class="spinner"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CURRENT ORDER PAGE (HIDDEN) -->
+    <div class="current-order-page" id="currentOrderPage">
+        <div class="current-order-header">
+            <button class="back-btn" onclick="closeCurrentOrder()">
+                <i class="fas fa-arrow-left"></i> Back to Menu
+            </button>
+            <h2>Current Order</h2>
+            <div style="width: 80px;"></div>
+        </div>
+
+        <div class="order-summary">
+            <h4 style="margin-bottom: 15px;">Order Summary</h4>
+            <div id="orderItemsList">
+                <div class="spinner"></div>
+            </div>
+            
+            <div class="order-total-section">
+                <div style="font-size: 14px; color: var(--gray); margin-bottom: 5px;">TOTAL AMOUNT</div>
+                <div class="total-amount" id="currentOrderTotal">₱0</div>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px;">
+            <button class="btn btn-secondary" onclick="closeCurrentOrder()">
+                <i class="fas fa-edit"></i> Continue Ordering
+            </button>
+            <button class="btn btn-success" onclick="reviewOrder()">
+                <i class="fas fa-clipboard-check"></i> Review & Send to Kitchen
+            </button>
+        </div>
+    </div>
+
+    <!-- PROFILE MODAL (HIDDEN BY DEFAULT) -->
+    <div class="modal" id="profileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user"></i> My Profile</h3>
+                <div class="close-modal" onclick="closeModal('profileModal')">&times;</div>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center; padding: 20px 0;">
+                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; color: white; margin: 0 auto 15px auto;">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <h3 id="profileName" style="margin-bottom: 5px;">Loading...</h3>
+                    <p id="profileRole" style="color: var(--gray); margin-bottom: 20px;">Loading...</p>
+                    
+                    <!-- STATS -->
+                    <div class="stats-grid" id="profileStats">
+                        <div class="stat-card">
+                            <div class="stat-value">0</div>
+                            <div class="stat-label">Active Tables</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">₱0</div>
+                            <div class="stat-label">Today's Sales</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">⭐ 0.0</div>
+                            <div class="stat-label">Rating</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: white; padding: 15px; border-radius: 15px; margin-top: 20px;" id="performanceData">
+                        <h4 style="margin-bottom: 10px;">Today's Performance</h4>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Tables Served:</span>
+                            <span style="font-weight: bold;">0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Total Sales:</span>
+                            <span style="font-weight: bold;">₱0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Average Rating:</span>
+                            <span style="font-weight: bold;">⭐ 0.0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="btn-group" style="margin-top: 20px;">
+                    <button class="btn btn-secondary" onclick="closeModal('profileModal')">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: NEW ORDER -->
+    <div class="modal" id="newOrderModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-plus-circle"></i> New Order</h3>
+                <div class="close-modal" onclick="closeModal('newOrderModal')">&times;</div>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label class="input-label">Table Number</label>
+                    <input type="text" class="input-field" id="tableNumber" readonly>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Number of Customers</label>
+                    <div class="customer-selector" id="customerSelector">
+                        <div class="customer-btn" onclick="selectCustomers(2)">2</div>
+                        <div class="customer-btn" onclick="selectCustomers(4)">4</div>
+                        <div class="customer-btn" onclick="selectCustomers(6)">6</div>
+                        <div class="customer-btn" onclick="selectCustomers(8)">8</div>
+                        <div class="customer-btn" onclick="selectCustomers(10)">10</div>
+                        <div class="customer-btn" onclick="selectCustomers(12)">12+</div>
+                    </div>
+                    <input type="number" class="input-field" id="customerCount" min="1" max="20" value="4">
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Special Requests</label>
+                    <textarea class="input-field" id="specialRequests" rows="3" placeholder="e.g., Birthday celebration, food allergies, special arrangements..."></textarea>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="closeModal('newOrderModal')">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button class="btn btn-primary" onclick="goToMenu()">
+                        <i class="fas fa-arrow-right"></i> Go to Menu
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ORDER REVIEW -->
+    <div class="modal" id="orderReviewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-clipboard-check"></i> Order Review</h3>
+                <div class="close-modal" onclick="closeModal('orderReviewModal')">&times;</div>
+            </div>
+            <div class="modal-body">
+                <!-- ORDER DETAILS -->
+                <div class="input-group">
+                    <label class="input-label">Table Information</label>
+                    <div style="display: flex; justify-content: space-between; align-items: center; background: var(--light); padding: 15px; border-radius: 12px; margin-bottom: 10px;">
+                        <div>
+                            <div style="font-weight: 600;">Table: <span id="reviewTableNumber">Loading...</span></div>
+                            <div style="font-size: 14px; color: var(--gray);"><span id="reviewCustomerCount">0</span> customers</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 12px; color: var(--gray);">Order Time</div>
+                            <div style="font-weight: 600;" id="reviewOrderTime">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Order Items</label>
+                    <div class="modal-scrollable">
+                        <div class="order-items" id="reviewOrderItems">
+                            <div style="text-align: center; padding: 20px; color: var(--gray);">
+                                <i class="fas fa-clipboard-list" style="font-size: 30px; margin-bottom: 10px; opacity: 0.5;"></i>
+                                <p>No order items to review</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SPECIAL NOTES -->
+                <div class="input-group" id="specialNotesContainer" style="display: none;">
+                    <label class="input-label">Special Requests</label>
+                    <div class="special-notes" id="reviewSpecialNotes">
+                        No special requests
+                    </div>
+                </div>
+
+                <!-- ORDER TOTAL -->
+                <div class="input-group">
+                    <label class="input-label">Order Total</label>
+                    <div style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 20px; border-radius: 15px; text-align: center;">
+                        <div style="font-size: 14px; opacity: 0.9; margin-bottom: 5px;">TOTAL AMOUNT</div>
+                        <div style="font-size: 28px; font-weight: 800;" id="reviewOrderTotal">₱0</div>
+                    </div>
+                </div>
+
+                <!-- ACTION BUTTONS -->
+                <div class="btn-group" style="grid-template-columns: 1fr 1fr; margin-top: 20px;">
+                    <button class="btn btn-secondary" onclick="editOrderFromReview()">
+                        <i class="fas fa-edit"></i> Edit Order
+                    </button>
+                    <button class="btn btn-success" onclick="sendToKitchen()">
+                        <i class="fas fa-paper-plane"></i> Send to Kitchen
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: OCCUPIED TABLE -->
+    <div class="modal" id="occupiedTableModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-concierge-bell"></i> Table Details</h3>
+                <div class="close-modal" onclick="closeModal('occupiedTableModal')">&times;</div>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label class="input-label">Table Status</label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <div class="table-status status-occupied">Occupied</div>
+                        <span id="tableTime">0 minutes</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Current Order</label>
+                    <div class="order-items" id="occupiedTableOrderItems">
+                        <div style="text-align: center; padding: 20px; color: var(--gray);">
+                            <i class="fas fa-clipboard-list" style="font-size: 30px; margin-bottom: 10px; opacity: 0.5;"></i>
+                            <p>No order items yet</p>
+                        </div>
+                    </div>
+                    <div style="text-align: right; margin-top: 10px;">
+                        <strong>Total: ₱<span id="currentTotal">0</span></strong>
+                    </div>
+                </div>
+
+                <div class="btn-group" style="grid-template-columns: 1fr 1fr; margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="addMoreItems()">
+                        <i class="fas fa-plus"></i> Add Items
+                    </button>
+                    <button class="btn btn-success" onclick="requestBill()">
+                        <i class="fas fa-receipt"></i> Request Bill
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: BILL REQUEST -->
+    <div class="modal" id="billRequestModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-receipt"></i> Request Bill</h3>
+                <div class="close-modal" onclick="closeModal('billRequestModal')">&times;</div>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label class="input-label">Bill Summary</label>
+                    <div style="background: var(--light); padding: 20px; border-radius: 15px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Subtotal:</span>
+                            <span>₱<span id="billSubtotal">0</span></span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Tax (12%):</span>
+                            <span>₱<span id="billTax">0</span></span>
+                        </div>
+                        <hr style="border: none; border-top: 2px solid var(--gray); margin: 15px 0;">
+                        <div style="display: flex; justify-content: space-between; font-size: 20px; font-weight: bold;">
+                            <span>TOTAL:</span>
+                            <span>₱<span id="billTotal">0</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Payment Split</label>
+                    <select class="input-field" id="splitOption">
+                        <option value="single">Single Bill</option>
+                        <option value="split2">Split into 2</option>
+                        <option value="split3">Split into 3</option>
+                        <option value="split4">Split into 4</option>
+                        <option value="custom">Custom Split</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Special Notes for Cashier</label>
+                    <textarea class="input-field" id="cashierNotes" rows="2" placeholder="Add any special instructions..."></textarea>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="closeModal('billRequestModal')">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button class="btn btn-success" onclick="sendToCashier()">
+                        <i class="fas fa-paper-plane"></i> Send to Cashier
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global data
+        let tables = [];
+        const menuItems = {
+            appetizer: [],
+            main: [],
+            lasa: [],
+            side: [],
+            dessert: [],
+            beverage: []
+        };
+
+        let currentTable = null;
+        let selectedCustomers = 4;
+        let currentOrder = [];
+        let currentSpecialRequests = '';
+        let itemQuantities = {};
+        let currentFilter = 'all';
+        let allMenuItems = [];
+        let refreshInterval;
+        let lastTablesState = '';
+        let tableTimesInterval;
+        
+        // IMPORTANT: Server time offset - to sync phone time with server time
+        let serverTimeOffset = 0;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTime();
+            setInterval(updateTime, 1000);
+            setupEventListeners();
+            showTablesSection();
+            
+            // Sync with server time FIRST
+            syncWithServerTime().then(() => {
+                console.log('✅ Server time synchronized. Offset:', serverTimeOffset, 'ms');
+                // Now load tables with correct time
+                loadTables();
+                startTableTimesUpdate();
+            }).catch(err => {
+                console.warn('⚠️ Could not sync server time, using device time');
+                loadTables();
+                startTableTimesUpdate();
+            });
+            
+            const waiterNameElement = document.getElementById('waiterName');
+            if (waiterNameElement) {
+                if (waiterNameElement.textContent.includes('Waiter:') && !waiterNameElement.textContent.includes('Loading...')) {
+                    const name = waiterNameElement.textContent.replace('Waiter: ', '');
+                    document.getElementById('profileName').textContent = name;
+                    document.getElementById('profileRole').textContent = 'Waiter';
+                } else {
+                    const storedName = sessionStorage.getItem('waiterName') || 'John Doe';
+                    waiterNameElement.textContent = `Waiter: ${storedName}`;
+                    document.getElementById('profileName').textContent = storedName;
+                    document.getElementById('profileRole').textContent = 'Waiter';
+                }
+            }
+            
+            loadAllMenuItemsFromServer();
+            
+            window.addEventListener('resize', updateButtonVisibility);
+            updateButtonVisibility();
+        });
+
+        // ==================== SERVER TIME SYNC ====================
+        async function syncWithServerTime() {
+            try {
+                const startTime = Date.now();
+                const response = await fetch('/api/time');
+                
+                if (!response.ok) {
+                    throw new Error('Failed to get server time');
+                }
+                
+                const serverData = await response.json();
+                const serverTimestamp = serverData.timestamp;
+                const endTime = Date.now();
+                const roundTripTime = endTime - startTime;
+                
+                // Calculate offset: Server time = Device time + offset
+                // Account for network latency (half of round trip)
+                const estimatedLatency = roundTripTime / 2;
+                serverTimeOffset = serverTimestamp - (startTime + estimatedLatency);
+                
+                console.log('🕒 Time Sync Results:', {
+                    serverTime: new Date(serverTimestamp).toLocaleString(),
+                    deviceTime: new Date(startTime).toLocaleString(),
+                    offset: serverTimeOffset + 'ms (' + (serverTimeOffset/1000).toFixed(1) + 's)',
+                    roundTrip: roundTripTime + 'ms'
+                });
+                
+                return true;
+            } catch (error) {
+                console.error('Time sync failed:', error);
+                // Try alternative method using response headers
+                try {
+                    const response = await fetch('/api/tables');
+                    const serverTimeHeader = response.headers.get('date');
+                    if (serverTimeHeader) {
+                        const serverTime = new Date(serverTimeHeader).getTime();
+                        const deviceTime = Date.now();
+                        serverTimeOffset = serverTime - deviceTime;
+                        console.log('🕒 Server time from header:', new Date(serverTime).toLocaleString());
+                        return true;
+                    }
+                } catch (e) {
+                    console.warn('Both time sync methods failed');
+                }
+                serverTimeOffset = 0;
+                return false;
+            }
+        }
+
+        // Get current server time (adjusted)
+        function getServerTime() {
+            return Date.now() + serverTimeOffset;
+        }
+
+        // ==================== TABLE TIME UPDATES ====================
+        function startTableTimesUpdate() {
+            if (tableTimesInterval) clearInterval(tableTimesInterval);
+            
+            // Update table times every 30 seconds
+            tableTimesInterval = setInterval(() => {
+                updateTableTimes();
+            }, 30000);
+            
+            // Also update immediately
+            updateTableTimes();
+        }
+
+        // Update table times in real-time
+        function updateTableTimes() {
+            const now = getServerTime();
+            
+            document.querySelectorAll('.table-card.occupied').forEach(tableCard => {
+                const timeElement = tableCard.querySelector('.table-time');
+                if (!timeElement) return;
+                
+                const tableNumber = tableCard.querySelector('.table-number').textContent;
+                const table = tables.find(t => t.table_number === tableNumber);
+                
+                if (table && table.occupied_since) {
+                    try {
+                        // Parse the occupied_since string
+                        const occupiedTime = new Date(table.occupied_since).getTime();
+                        
+                        // Calculate difference using server-adjusted time
+                        const diffMs = now - occupiedTime;
+                        const diffMins = Math.max(0, Math.floor(diffMs / 60000));
+                        
+                        // Format time display
+                        let timeDisplay = '';
+                        if (diffMins < 60) {
+                            timeDisplay = `${diffMins}m`;
+                        } else {
+                            const hours = Math.floor(diffMins / 60);
+                            const minutes = diffMins % 60;
+                            timeDisplay = `${hours}h ${minutes}m`;
+                        }
+                        
+                        timeElement.textContent = timeDisplay;
+                    } catch (e) {
+                        console.warn('Error updating table time:', e);
+                        timeElement.textContent = '--';
+                    }
+                }
+            });
+            
+            // Update the occupied modal time if open
+            updateOccupiedModalTime();
+        }
+
+        // Update occupied modal time
+        function updateOccupiedModalTime() {
+            const modal = document.getElementById('occupiedTableModal');
+            if (modal.classList.contains('active') && currentTable && currentTable.occupied_since) {
+                const now = getServerTime();
+                
+                try {
+                    const occupiedTime = new Date(currentTable.occupied_since).getTime();
+                    const diffMs = now - occupiedTime;
+                    const diffMins = Math.max(0, Math.floor(diffMs / 60000));
+                    
+                    let timeDisplay = '';
+                    if (diffMins < 60) {
+                        timeDisplay = `${diffMins} minute${diffMins !== 1 ? 's' : ''}`;
+                    } else {
+                        const hours = Math.floor(diffMins / 60);
+                        const minutes = diffMins % 60;
+                        timeDisplay = `${hours} hour${hours > 1 ? 's' : ''} ${minutes} minute${minutes !== 1 ? 's' : ''}`;
+                    }
+                    
+                    document.getElementById('tableTime').textContent = timeDisplay;
+                } catch (e) {
+                    console.warn('Error updating modal time:', e);
+                    document.getElementById('tableTime').textContent = '-- minutes';
+                }
+            }
+        }
+
+        // ==================== 5-SECOND AUTO-REFRESH ====================
+        function startAutoRefresh() {
+            // Clear existing interval
+            if (refreshInterval) clearInterval(refreshInterval);
+            
+            console.log('🔄 Starting 5-second auto-refresh...');
+            
+            // Show refresh indicator
+            document.getElementById('refreshIndicator').classList.add('active');
+            
+            // Refresh every 5 seconds when on tables view
+            refreshInterval = setInterval(() => {
+                if (document.getElementById('tablesSection').style.display !== 'none') {
+                    console.log('🔄 Auto-refreshing tables...');
+                    silentRefreshTables();
+                }
+            }, 5000); // 5 SECONDS!
+        }
+
+        function stopAutoRefresh() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+                refreshInterval = null;
+                console.log('⏹️ Stopped auto-refresh');
+                
+                // Hide refresh indicator
+                document.getElementById('refreshIndicator').classList.remove('active');
+            }
+        }
+
+        // Silent refresh (no loading animation)
+        function silentRefreshTables() {
+            fetch('/api/tables')
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to load tables');
+                    return response.json();
+                })
+                .then(data => {
+                    // Update last refresh time
+                    const now = new Date();
+                    const timeString = now.toLocaleTimeString('en-US', { 
+                        hour: '2-digit', 
+                        minute: '2-digit',
+                        second: '2-digit'
+                    });
+                    document.getElementById('lastRefreshTime').textContent = `Last: ${timeString}`;
+                    
+                    // Check if tables actually changed
+                    const newTablesState = JSON.stringify(data.map(t => ({ 
+                        number: t.table_number, 
+                        status: t.status 
+                    })));
+                    
+                    if (lastTablesState !== newTablesState) {
+                        console.log('🔄 Tables changed, updating display...');
+                        lastTablesState = newTablesState;
+                        tables = data;
+                        renderTables();
+                        
+                        // Check for newly available tables
+                        checkForNewlyAvailableTables(data);
+                    }
+                })
+                .catch(error => {
+                    console.error('Auto-refresh error:', error);
+                });
+        }
+
+        // Check for newly available tables
+        function checkForNewlyAvailableTables(newTables) {
+            if (!tables || tables.length === 0) return;
+            
+            const newlyAvailable = [];
+            
+            // Compare with previous state
+            newTables.forEach(newTable => {
+                if (newTable.status === 'available') {
+                    const oldTable = tables.find(t => t.table_number === newTable.table_number);
+                    if (oldTable && oldTable.status === 'occupied') {
+                        newlyAvailable.push(newTable.table_number);
+                    }
+                }
+            });
+            
+            if (newlyAvailable.length > 0) {
+                showAutoRefreshNotification(newlyAvailable);
+            }
+        }
+
+        // Show auto-refresh notification
+        function showAutoRefreshNotification(tables) {
+            const tableNumbers = tables.join(', ');
+            
+            const notification = document.createElement('div');
+            notification.className = 'auto-refresh-notification';
+            notification.innerHTML = `
+                <i class="fas fa-check-circle" style="font-size: 14px;"></i>
+                <span>Table${tables.length > 1 ? 's' : ''} ${tableNumbers} now available</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 4000);
+        }
+
+        // Force refresh tables (manual)
+        function forceRefreshTables() {
+            const refreshBtn = event.target.closest('.refresh-btn');
+            const icon = refreshBtn.querySelector('i');
+            
+            // Add spinning animation
+            icon.classList.add('fa-spin');
+            refreshBtn.disabled = true;
+            
+            // Load tables
+            loadTables();
+            
+            // Update last refresh time
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('lastRefreshTime').textContent = `Last: ${timeString}`;
+            
+            // Remove animation after 1 second
+            setTimeout(() => {
+                icon.classList.remove('fa-spin');
+                refreshBtn.disabled = false;
+                
+                // Show success message
+                showRefreshSuccess();
+            }, 1000);
+        }
+
+        // Show refresh success
+        function showRefreshSuccess() {
+            const notification = document.createElement('div');
+            notification.className = 'auto-refresh-notification';
+            notification.innerHTML = `
+                <i class="fas fa-sync-alt" style="font-size: 14px;"></i>
+                <span>Tables refreshed successfully!</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 3000);
+        }
+
+        // Update button visibility based on screen size
+        function updateButtonVisibility() {
+            const btnTexts = document.querySelectorAll('.btn-text');
+            const viewOrderBtn = document.getElementById('viewOrderBtn');
+            
+            if (window.innerWidth <= 360) {
+                // Very small screens - show icons only
+                btnTexts.forEach(text => {
+                    text.style.display = 'none';
+                });
+                if (viewOrderBtn) {
+                    viewOrderBtn.style.minWidth = '40px';
+                    viewOrderBtn.style.width = '40px';
+                    viewOrderBtn.style.height = '40px';
+                    viewOrderBtn.style.borderRadius = '50%';
+                    viewOrderBtn.style.justifyContent = 'center';
+                    viewOrderBtn.style.padding = '0';
+                }
+            } else {
+                // Normal screens - show text
+                btnTexts.forEach(text => {
+                    text.style.display = 'inline';
+                });
+                if (viewOrderBtn) {
+                    viewOrderBtn.style.minWidth = '120px';
+                    viewOrderBtn.style.width = 'auto';
+                    viewOrderBtn.style.height = 'auto';
+                    viewOrderBtn.style.borderRadius = '50px';
+                    viewOrderBtn.style.justifyContent = 'flex-start';
+                    viewOrderBtn.style.padding = '10px 15px';
+                }
+            }
+        }
+
+        // Update time display
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+            });
+            const dateString = now.toLocaleDateString('en-US', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric'
+            });
+            document.getElementById('currentTime').textContent = `${dateString} • ${timeString}`;
+        }
+
+        // Load tables from server
+        async function loadTables() {
+            try {
+                const response = await fetch('/api/tables');
+                if (!response.ok) throw new Error('Failed to load tables');
+                
+                tables = await response.json();
+                
+                // Calculate duration for occupied tables
+                const now = getServerTime();
+                tables.forEach(table => {
+                    if (table.status === 'occupied' && table.occupied_since) {
+                        try {
+                            const occupiedTime = new Date(table.occupied_since).getTime();
+                            const diffMs = now - occupiedTime;
+                            table.duration_minutes = Math.max(0, Math.floor(diffMs / 60000));
+                        } catch (e) {
+                            table.duration_minutes = 0;
+                        }
+                    }
+                });
+                
+                lastTablesState = JSON.stringify(tables.map(t => ({ 
+                    number: t.table_number, 
+                    status: t.status 
+                })));
+                renderTables();
+                
+                // Start updating times
+                updateTableTimes();
+            } catch (error) {
+                console.error('Error loading tables:', error);
+                tables = [
+                    { id: 1, table_number: '1', capacity: '3-5p', status: 'available', time: null },
+                    { id: 2, table_number: '2', capacity: '3-5p', status: 'available', time: null },
+                    { id: 3, table_number: '3', capacity: '3-5p', status: 'available', time: null },
+                    { id: 4, table_number: '4', capacity: '3-5p', status: 'available', time: null },
+                    { id: 5, table_number: '5', capacity: '4-6p', status: 'available', time: null },
+                    { id: 6, table_number: '6', capacity: '4-6p', status: 'available', time: null },
+                    { id: 7, table_number: '7', capacity: '4-6p', status: 'available', time: null },
+                    { id: 8, table_number: '8', capacity: '6-8p', status: 'available', time: null },
+                    { id: 9, table_number: '9', capacity: '6-8p', status: 'available', time: null },
+                    { id: 10, table_number: '10', capacity: '8-10p', status: 'available', time: null },
+                    { id: 11, table_number: '11', capacity: '8-10p', status: 'available', time: null },
+                    { id: 12, table_number: '12', capacity: '10-12p', status: 'available', time: null },
+                ];
+                renderTables();
+            }
+        }
+
+        // Render tables
+        function renderTables() {
+            const tablesGrid = document.getElementById('tablesGrid');
+            tablesGrid.innerHTML = '';
+
+            let filteredTables = tables;
+            if (currentFilter === 'available') {
+                filteredTables = tables.filter(table => table.status === 'available');
+            } else if (currentFilter === 'occupied') {
+                filteredTables = tables.filter(table => table.status === 'occupied');
+            }
+
+            filteredTables.forEach(table => {
+                const statusClass = getStatusClass(table.status);
+                const statusText = getStatusText(table.status);
+                
+                let chairsClass = 'chairs-4';
+                let chairCount = 4;
+                let tableSizeClass = '';
+                
+                if (table.capacity === '3-5p') {
+                    chairsClass = 'chairs-4';
+                    chairCount = 4;
+                } else if (table.capacity === '4-6p') {
+                    chairsClass = 'chairs-6-sides';
+                    chairCount = 6;
+                    tableSizeClass = 'medium-table';
+                } else if (table.capacity === '6-8p') {
+                    chairsClass = 'chairs-6-rect';
+                    chairCount = 6;
+                    tableSizeClass = 'large-table';
+                } else if (table.capacity === '8-10p' || table.capacity === '10-12p') {
+                    chairsClass = 'chairs-8-rect';
+                    chairCount = 8;
+                    tableSizeClass = 'xlarge-table';
+                }
+                
+                const tableCard = document.createElement('div');
+                tableCard.className = `table-card ${table.status} ${tableSizeClass}`;
+                
+                let chairsHTML = '';
+                for (let i = 0; i < chairCount; i++) {
+                    chairsHTML += '<div class="chair"></div>';
+                }
+                
+                let tableTime = '';
+                if (table.status === 'occupied') {
+                    if (table.duration_minutes) {
+                        // Use calculated duration
+                        const diffMins = table.duration_minutes;
+                        if (diffMins < 60) {
+                            tableTime = `${diffMins}m`;
+                        } else {
+                            const hours = Math.floor(diffMins / 60);
+                            const minutes = diffMins % 60;
+                            tableTime = `${hours}h ${minutes}m`;
+                        }
+                    } else if (table.occupied_since) {
+                        // Calculate if not already calculated
+                        const now = getServerTime();
+                        try {
+                            const occupiedTime = new Date(table.occupied_since).getTime();
+                            const diffMs = now - occupiedTime;
+                            const diffMins = Math.max(0, Math.floor(diffMs / 60000));
+                            tableTime = `${diffMins}m`;
+                        } catch (e) {
+                            tableTime = '--';
+                        }
+                    }
+                }
+                
+                tableCard.innerHTML = `
+                    <div class="table-visual">
+                        <div class="table-center">
+                            <div class="table-number">${table.table_number}</div>
+                        </div>
+                        <div class="${chairsClass}">
+                            ${chairsHTML}
+                        </div>
+                    </div>
+                    <div class="table-info">
+                        <div class="table-capacity">${table.capacity}</div>
+                        <div class="table-status ${statusClass}">${statusText}</div>
+                        ${tableTime ? `<div class="table-time">${tableTime}</div>` : ''}
+                    </div>
+                `;
+                
+                tableCard.onclick = () => handleTableClick(table);
+                tablesGrid.appendChild(tableCard);
+            });
+
+            if (filteredTables.length === 0) {
+                tablesGrid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: var(--gray);">
+                        <i class="fas fa-utensils" style="font-size: 50px; margin-bottom: 15px; opacity: 0.5;"></i>
+                        <p>No ${currentFilter} tables found</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Get status class
+        function getStatusClass(status) {
+            const classes = {
+                'available': 'status-available',
+                'occupied': 'status-occupied'
+            };
+            return classes[status] || 'status-available';
+        }
+
+        // Get status text
+        function getStatusText(status) {
+            const texts = {
+                'available': 'AVAILABLE',
+                'occupied': 'OCCUPIED'
+            };
+            return texts[status] || 'AVAILABLE';
+        }
+
+        // Handle table click
+        async function handleTableClick(table) {
+            currentTable = table;
+            
+            if (table.status === 'available') {
+                document.getElementById('tableNumber').value = `Table ${table.table_number}`;
+                openModal('newOrderModal');
+            } else if (table.status === 'occupied') {
+                await loadCurrentOrderForTable(table.table_number);
+                
+                // Set initial time in modal
+                const now = getServerTime();
+                if (table.occupied_since) {
+                    try {
+                        const occupiedTime = new Date(table.occupied_since).getTime();
+                        const diffMs = now - occupiedTime;
+                        const diffMins = Math.max(0, Math.floor(diffMs / 60000));
+                        
+                        let timeDisplay = '';
+                        if (diffMins < 60) {
+                            timeDisplay = `${diffMins} minute${diffMins !== 1 ? 's' : ''}`;
+                        } else {
+                            const hours = Math.floor(diffMins / 60);
+                            const minutes = diffMins % 60;
+                            timeDisplay = `${hours} hour${hours > 1 ? 's' : ''} ${minutes} minute${minutes !== 1 ? 's' : ''}`;
+                        }
+                        
+                        document.getElementById('tableTime').textContent = timeDisplay;
+                    } catch (e) {
+                        document.getElementById('tableTime').textContent = '-- minutes';
+                    }
+                } else {
+                    document.getElementById('tableTime').textContent = '0 minutes';
+                }
+                
+                openModal('occupiedTableModal');
+            }
+        }
+
+        // Load current order for occupied table
+        async function loadCurrentOrderForTable(tableNumber) {
+            try {
+                const response = await fetch(`/api/orders`);
+                if (!response.ok) throw new Error('Failed to load orders');
+                
+                const orders = await response.json();
+                const orderItemsContainer = document.getElementById('occupiedTableOrderItems');
+                const currentTotalElement = document.getElementById('currentTotal');
+                
+                const tableOrder = orders.find(order => 
+                    (order.table_number || order.table) == tableNumber && 
+                    ['pending', 'preparing', 'served'].includes(order.status)
+                );
+                
+                if (tableOrder) {
+                    let itemsHTML = '';
+                    let total = tableOrder.total || 0;
+                    
+                    let items = [];
+                    if (Array.isArray(tableOrder.items)) {
+                        items = tableOrder.items;
+                    } else if (typeof tableOrder.items === 'string') {
+                        try {
+                            items = JSON.parse(tableOrder.items);
+                        } catch (e) {
+                            items = [{dish: tableOrder.items, price: 0, qty: 1}];
+                        }
+                    }
+                    
+                    if (items.length > 0) {
+                        items.forEach(item => {
+                            const qty = item.qty || 1;
+                            const price = item.price || 0;
+                            const name = item.dish || item.name || 'Unknown Item';
+                            const itemTotal = qty * price;
+                            
+                            itemsHTML += `
+                                <div class="order-review-item">
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 600;">${name} × ${qty}</div>
+                                        <div style="font-size: 12px; color: var(--gray);">₱${price} each</div>
+                                    </div>
+                                    <div style="font-weight: bold; color: var(--dark);">
+                                        ₱${itemTotal}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        itemsHTML = `
+                            <div style="text-align: center; padding: 20px; color: var(--gray);">
+                                <i class="fas fa-clipboard-list" style="font-size: 30px; margin-bottom: 10px; opacity: 0.5;"></i>
+                                <p>No order items found</p>
+                            </div>
+                        `;
+                    }
+                    
+                    orderItemsContainer.innerHTML = itemsHTML;
+                    currentTotalElement.textContent = total;
+                } else {
+                    orderItemsContainer.innerHTML = `
+                        <div style="text-align: center; padding: 20px; color: var(--gray);">
+                            <i class="fas fa-clipboard-list" style="font-size: 30px; margin-bottom: 10px; opacity: 0.5;"></i>
+                            <p>No active order found</p>
+                        </div>
+                    `;
+                    currentTotalElement.textContent = '0';
+                }
+                
+            } catch (error) {
+                console.error('Error loading table order:', error);
+                document.getElementById('occupiedTableOrderItems').innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: var(--danger);">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Error loading order</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Filter tables
+        function filterTables(filter) {
+            currentFilter = filter;
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            renderTables();
+        }
+
+        // Select number of customers
+        function selectCustomers(count) {
+            selectedCustomers = count;
+            document.getElementById('customerCount').value = count;
+            
+            document.querySelectorAll('.customer-btn').forEach(btn => {
+                btn.classList.remove('selected');
+                if (parseInt(btn.textContent) === count) {
+                    btn.classList.add('selected');
+                }
+            });
+        }
+
+        // Go to Menu after selecting customers
+        function goToMenu() {
+            const customerCount = document.getElementById('customerCount').value;
+            const specialRequests = document.getElementById('specialRequests').value;
+            
+            if (!customerCount || customerCount < 1) {
+                alert('Please enter number of customers');
+                return;
+            }
+
+            if (currentTable) {
+                currentTable.customers = customerCount;
+                currentSpecialRequests = specialRequests;
+                
+                if (Object.keys(itemQuantities).length === 0) {
+                    currentOrder = [];
+                    initializeItemQuantities();
+                }
+                updateOrderBadge();
+            }
+
+            closeModal('newOrderModal');
+            
+            const orderInfo = document.getElementById('currentOrderInfo');
+            if (orderInfo && currentTable) {
+                orderInfo.innerHTML = `Table ${currentTable.table_number} • ${customerCount} customers`;
+                if (specialRequests) {
+                    orderInfo.innerHTML += ` • <span style="color: var(--warning);">Special requests noted</span>`;
+                }
+            }
+            
+            showMenuSection();
+        }
+
+        // Load all menu items from server
+        async function loadAllMenuItemsFromServer() {
+            try {
+                const response = await fetch('/api/waiter/dishes');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const dishes = await response.json();
+                
+                for (const category in menuItems) {
+                    menuItems[category] = [];
+                }
+                allMenuItems = dishes;
+                
+                dishes.forEach(dish => {
+                    const category = getCategoryKey(dish.category);
+                    if (category && menuItems[category]) {
+                        const isAvailable = (dish.availability === 1 || dish.available === true);
+                        
+                        if (isAvailable) {
+                            menuItems[category].push({
+                                id: dish.id,
+                                name: dish.name,
+                                description: dish.description || 'No description available',
+                                price: dish.price,
+                                category: dish.category,
+                                image: dish.image || '🍽️',
+                                available: true
+                            });
+                        }
+                    }
+                });
+                
+                if (Object.keys(itemQuantities).length === 0) {
+                    initializeItemQuantities();
+                } else {
+                    preserveItemQuantities();
+                }
+                
+                updateCategoryCounts();
+                refreshAllMenuItems();
+                
+            } catch (error) {
+                console.error('Error loading menu items:', error);
+                showError('Failed to load menu items. Please try again.');
+                
+                document.querySelectorAll('.menu-items-container').forEach(container => {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 40px 20px; color: var(--gray);">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 50px; margin-bottom: 15px; color: var(--danger);"></i>
+                            <p>Error loading menu items</p>
+                            <p style="font-size: 12px; margin-top: 10px;">Please contact manager or refresh the page</p>
+                            <button onclick="loadAllMenuItemsFromServer()" style="margin-top: 10px; padding: 8px 16px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer;">
+                                <i class="fas fa-sync-alt"></i> Retry
+                            </button>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        // Map category names to keys
+        function getCategoryKey(categoryName) {
+            const categoryMap = {
+                'Appetizer': 'appetizer',
+                'Main Course': 'main',
+                'Lasa Specialty': 'lasa',
+                'Side Dish': 'side',
+                'Dessert': 'dessert',
+                'Beverage': 'beverage'
+            };
+            return categoryMap[categoryName] || null;
+        }
+
+        // Update category counts
+        function updateCategoryCounts() {
+            document.getElementById('appetizerCount').textContent = menuItems.appetizer.length + ' items';
+            document.getElementById('mainCount').textContent = menuItems.main.length + ' items';
+            document.getElementById('lasaCount').textContent = menuItems.lasa.length + ' items';
+            document.getElementById('sideCount').textContent = menuItems.side.length + ' items';
+            document.getElementById('dessertCount').textContent = menuItems.dessert.length + ' items';
+            document.getElementById('beverageCount').textContent = menuItems.beverage.length + ' items';
+        }
+
+        // Initialize item quantities
+        function initializeItemQuantities() {
+            itemQuantities = {};
+            for (const category in menuItems) {
+                menuItems[category].forEach(item => {
+                    itemQuantities[item.id] = itemQuantities[item.id] || 0;
+                });
+            }
+        }
+
+        // Preserve item quantities when reloading menu
+        function preserveItemQuantities() {
+            const tempQuantities = { ...itemQuantities };
+            itemQuantities = {};
+            
+            for (const category in menuItems) {
+                menuItems[category].forEach(item => {
+                    itemQuantities[item.id] = tempQuantities[item.id] || 0;
+                });
+            }
+        }
+
+        // Refresh all menu items
+        function refreshAllMenuItems() {
+            loadMenuItems('appetizer', 'appetizerItems');
+            loadMenuItems('main', 'mainItems');
+            loadMenuItems('lasa', 'lasaItems');
+            loadMenuItems('side', 'sideItems');
+            loadMenuItems('dessert', 'dessertItems');
+            loadMenuItems('beverage', 'beverageItems');
+        }
+
+        // Load menu items for a category
+        function loadMenuItems(category, containerId) {
+            const container = document.getElementById(containerId);
+            const items = menuItems[category] || [];
+            
+            container.innerHTML = '';
+            
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: var(--gray);">
+                        <i class="fas fa-utensils" style="font-size: 50px; margin-bottom: 15px; opacity: 0.5;"></i>
+                            <p>No ${category} items available</p>
+                            <p style="font-size: 12px; margin-top: 10px;">Manager needs to add dishes first</p>
+                        </div>
+                    `;
+                return;
+            }
+            
+            items.forEach(item => {
+                const quantity = itemQuantities[item.id] || 0;
+                const isInOrder = quantity > 0;
+                
+                let imageHTML = '';
+                if (item.image) {
+                    if (item.image.startsWith('http') || item.image.startsWith('data:image')) {
+                        imageHTML = `<img src="${item.image}" alt="${item.name}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 10px; margin-right: 15px;">`;
+                    } else {
+                        imageHTML = `<div style="width: 100px; height: 100px; background: #f0f0f0; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 40px; margin-right: 15px;">${item.image}</div>`;
+                    }
+                } else {
+                    imageHTML = `<div style="width: 100px; height: 100px; background: #f0f0f0; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 40px; margin-right: 15px;">🍽️</div>`;
+                }
+                
+                const menuItemCard = document.createElement('div');
+                menuItemCard.className = 'menu-item-card';
+                menuItemCard.innerHTML = `
+                    <div style="display: flex; align-items: flex-start; margin-bottom: 15px;">
+                        ${imageHTML}
+                        <div style="flex: 1;">
+                            <div class="menu-item-title">${item.name}</div>
+                            <div class="menu-item-description">${item.description}</div>
+                            <div class="menu-item-price" style="margin-top: 10px;">₱${item.price}</div>
+                        </div>
+                    </div>
+                    <div class="menu-item-controls">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn" ${quantity === 0 ? 'disabled' : ''} onclick="decreaseItemQuantity(${item.id})">-</button>
+                            <div class="quantity-value">${quantity}</div>
+                            <button class="quantity-btn" onclick="increaseItemQuantity(${item.id})">+</button>
+                        </div>
+                        <button class="add-item-btn ${isInOrder ? 'added' : ''}" onclick="addItemToOrder(${item.id})">
+                            <i class="fas ${isInOrder ? 'fa-check' : 'fa-plus'}"></i>
+                            ${isInOrder ? 'ADDED' : 'ADD'}
+                        </button>
+                    </div>
+                `;
+                
+                const minusBtn = menuItemCard.querySelector('.quantity-btn:first-child');
+                if (minusBtn && quantity === 0) {
+                    minusBtn.disabled = true;
+                    minusBtn.style.opacity = '0.5';
+                    minusBtn.style.cursor = 'not-allowed';
+                }
+                
+                container.appendChild(menuItemCard);
+            });
+        }
+
+        // Open category page
+        function openCategory(category) {
+            document.getElementById('categoriesPage').style.display = 'none';
+            document.getElementById(category + 'Page').classList.add('active');
+        }
+
+        // Back to categories
+        function backToCategories() {
+            document.querySelectorAll('.menu-items-page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById('categoriesPage').style.display = 'block';
+        }
+
+        // Increase item quantity
+        function increaseItemQuantity(itemId) {
+            itemId = parseInt(itemId);
+            const currentQty = itemQuantities[itemId] || 0;
+            itemQuantities[itemId] = currentQty + 1;
+            
+            updateItemInOrder(itemId);
+            updateMenuItemQuantityDisplay(itemId, itemQuantities[itemId]);
+            updateOrderBadge();
+            updateCurrentOrder();
+        }
+
+        // Decrease item quantity
+        function decreaseItemQuantity(itemId) {
+            itemId = parseInt(itemId);
+            const currentQty = itemQuantities[itemId] || 0;
+            
+            if (currentQty > 0) {
+                const newQty = currentQty - 1;
+                itemQuantities[itemId] = newQty;
+                updateItemInOrder(itemId);
+                updateMenuItemQuantityDisplay(itemId, newQty);
+                updateOrderBadge();
+                updateCurrentOrder();
+            }
+        }
+
+        // Update menu item quantity display immediately
+        function updateMenuItemQuantityDisplay(itemId, newQuantity) {
+            const allMenuCards = document.querySelectorAll('.menu-item-card');
+            
+            allMenuCards.forEach(card => {
+                const addBtn = card.querySelector('.add-item-btn');
+                if (addBtn && addBtn.onclick && addBtn.onclick.toString().includes(itemId.toString())) {
+                    const qtyValue = card.querySelector('.quantity-value');
+                    if (qtyValue) {
+                        qtyValue.textContent = newQuantity;
+                    }
+                    
+                    const minusBtn = card.querySelector('.quantity-btn:first-child');
+                    if (minusBtn) {
+                        minusBtn.disabled = newQuantity === 0;
+                        if (newQuantity === 0) {
+                            minusBtn.style.opacity = '0.5';
+                            minusBtn.style.cursor = 'not-allowed';
+                        } else {
+                            minusBtn.style.opacity = '1';
+                            minusBtn.style.cursor = 'pointer';
+                        }
+                    }
+                    
+                    if (addBtn) {
+                        if (newQuantity > 0) {
+                            addBtn.classList.add('added');
+                            addBtn.innerHTML = '<i class="fas fa-check"></i> ADDED';
+                        } else {
+                            addBtn.classList.remove('added');
+                            addBtn.innerHTML = '<i class="fas fa-plus"></i> ADD';
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update item in current order
+        function updateItemInOrder(itemId) {
+            const quantity = itemQuantities[itemId] || 0;
+            
+            let foundItem = null;
+            for (const category in menuItems) {
+                foundItem = menuItems[category].find(item => item.id === itemId);
+                if (foundItem) break;
+            }
+            
+            if (!foundItem) return;
+            
+            const existingIndex = currentOrder.findIndex(item => item.id === itemId);
+            
+            if (quantity === 0) {
+                if (existingIndex !== -1) {
+                    currentOrder.splice(existingIndex, 1);
+                }
+            } else {
+                if (existingIndex !== -1) {
+                    currentOrder[existingIndex].quantity = quantity;
+                    currentOrder[existingIndex].total = quantity * foundItem.price;
+                } else {
+                    currentOrder.push({
+                        id: foundItem.id,
+                        name: foundItem.name,
+                        price: foundItem.price,
+                        quantity: quantity,
+                        total: quantity * foundItem.price,
+                        category: foundItem.category
+                    });
+                }
+            }
+        }
+
+        // Add item to order
+        function addItemToOrder(itemId) {
+            itemId = parseInt(itemId);
+            let totalItems = 0;
+            for (const category in menuItems) {
+                totalItems += menuItems[category].length;
+            }
+            
+            if (totalItems === 0) {
+                alert('No menu items available. Manager needs to add dishes first.');
+                return;
+            }
+            
+            increaseItemQuantity(itemId);
+            
+            const orderInfo = document.getElementById('currentOrderInfo');
+            if (orderInfo && currentTable) {
+                let foundItem = null;
+                for (const category in menuItems) {
+                    foundItem = menuItems[category].find(item => item.id === itemId);
+                    if (foundItem) break;
+                }
+                
+                if (foundItem) {
+                    orderInfo.innerHTML = `Table ${currentTable.table_number} • ${currentTable.customers || selectedCustomers} customers • <span style="color: var(--success);">${foundItem.name} added</span>`;
+                    
+                    setTimeout(() => {
+                        if (currentTable) {
+                            orderInfo.textContent = `Table ${currentTable.table_number} • ${currentTable.customers || selectedCustomers} customers`;
+                            if (currentSpecialRequests) {
+                                orderInfo.innerHTML += ` • <span style="color: var(--warning);">Special requests noted</span>`;
+                            }
+                        }
+                    }, 2000);
+                }
+            }
+        }
+
+        // Update order badge
+        function updateOrderBadge() {
+            const totalItems = currentOrder.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('orderBadge').textContent = totalItems;
+            
+            if (totalItems > 0) {
+                document.getElementById('viewOrderBtn').style.display = 'flex';
+            } else {
+                document.getElementById('viewOrderBtn').style.display = 'none';
+            }
+        }
+
+        // Update current order array from itemQuantities
+        function updateCurrentOrder() {
+            recalculateCurrentOrder();
+        }
+
+        // Open current order page
+        function openCurrentOrder() {
+            document.getElementById('currentOrderPage').classList.add('active');
+            updateCurrentOrderPage();
+        }
+
+        // Close current order page
+        function closeCurrentOrder() {
+            document.getElementById('currentOrderPage').classList.remove('active');
+        }
+
+        // Increase quantity in Order View page
+        function increaseItemQuantityInOrder(itemId) {
+            itemId = parseInt(itemId);
+            const currentQty = itemQuantities[itemId] || 0;
+            itemQuantities[itemId] = currentQty + 1;
+            
+            updateItemInOrder(itemId);
+            updateMenuItemQuantityDisplay(itemId, itemQuantities[itemId]);
+            updateCurrentOrderPage();
+            updateOrderBadge();
+        }
+
+        // Decrease quantity in Order View page
+        function decreaseItemQuantityInOrder(itemId) {
+            itemId = parseInt(itemId);
+            const currentQty = itemQuantities[itemId] || 0;
+            
+            if (currentQty > 0) {
+                const newQty = currentQty - 1;
+                itemQuantities[itemId] = newQty;
+                updateItemInOrder(itemId);
+                updateMenuItemQuantityDisplay(itemId, newQty);
+                updateCurrentOrderPage();
+                updateOrderBadge();
+            }
+        }
+
+        // Update current order page
+        function updateCurrentOrderPage() {
+            const orderItemsList = document.getElementById('orderItemsList');
+            const currentOrderTotal = document.getElementById('currentOrderTotal');
+            
+            recalculateCurrentOrder();
+            
+            if (currentOrder.length === 0) {
+                orderItemsList.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: var(--gray);">
+                        <i class="fas fa-shopping-basket" style="font-size: 50px; margin-bottom: 15px; opacity: 0.5;"></i>
+                        <p>No items in the order yet</p>
+                    </div>
+                `;
+                currentOrderTotal.textContent = '₱0';
+                return;
+            }
+            
+            let total = 0;
+            let html = '';
+            
+            currentOrder.forEach(item => {
+                total += item.total;
+                
+                if (item.quantity > 0) {
+                    html += `
+                        <div class="order-summary-item" data-item-id="${item.id}">
+                            <div>
+                                <div style="font-weight: 600; font-size: 16px;">${item.name}</div>
+                                <div style="font-size: 14px; color: var(--gray);">₱${item.price} each</div>
+                            </div>
+                            <div class="order-item-controls">
+                                <button class="quantity-btn" onclick="decreaseItemQuantityInOrder(${item.id})" 
+                                        style="width: 30px; height: 30px;"
+                                        ${item.quantity === 1 ? 'disabled' : ''}>-</button>
+                                <div style="font-weight: 700; font-size: 18px; min-width: 30px; text-align: center;">${item.quantity}</div>
+                                <button class="quantity-btn" onclick="increaseItemQuantityInOrder(${item.id})" 
+                                        style="width: 30px; height: 30px;">+</button>
+                                <div style="font-weight: 700; font-size: 18px; color: var(--primary); margin-left: 15px;">₱${item.total}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            orderItemsList.innerHTML = html;
+            currentOrderTotal.textContent = `₱${total}`;
+            
+            if (html === '') {
+                orderItemsList.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: var(--gray);">
+                        <i class="fas fa-shopping-basket" style="font-size: 50px; margin-bottom: 15px; opacity: 0.5;"></i>
+                        <p>No items in the order yet</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Recalculate currentOrder array based on itemQuantities
+        function recalculateCurrentOrder() {
+            currentOrder = [];
+            
+            for (const itemId in itemQuantities) {
+                const quantity = itemQuantities[itemId];
+                
+                if (quantity > 0) {
+                    let foundItem = null;
+                    for (const category in menuItems) {
+                        foundItem = menuItems[category].find(item => item.id === parseInt(itemId));
+                        if (foundItem) break;
+                    }
+                    
+                    if (foundItem) {
+                        currentOrder.push({
+                            id: foundItem.id,
+                            name: foundItem.name,
+                            price: foundItem.price,
+                            quantity: quantity,
+                            total: quantity * foundItem.price,
+                            category: foundItem.category
+                        });
+                    }
+                }
+            }
+        }
+
+        // FIXED: Review order before sending to kitchen
+        function reviewOrder() {
+            if (currentOrder.length === 0) {
+                alert('Please add items to the order first');
+                return;
+            }
+            
+            closeCurrentOrder();
+            
+            // Update the review modal with current order details
+            document.getElementById('reviewTableNumber').textContent = `Table ${currentTable.table_number}`;
+            document.getElementById('reviewCustomerCount').textContent = `${currentTable.customers || selectedCustomers} customers`;
+            
+            // Set current time
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+            });
+            document.getElementById('reviewOrderTime').textContent = timeString;
+            
+            // Display order items
+            const reviewOrderItems = document.getElementById('reviewOrderItems');
+            let html = '';
+            let total = 0;
+            
+            if (currentOrder.length === 0) {
+                html = `
+                    <div style="text-align: center; padding: 20px; color: var(--gray);">
+                        <i class="fas fa-clipboard-list" style="font-size: 30px; margin-bottom: 10px; opacity: 0.5;"></i>
+                        <p>No order items to review</p>
+                    </div>
+                `;
+            } else {
+                currentOrder.forEach(item => {
+                    total += item.total;
+                    html += `
+                        <div class="order-review-item">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600;">${item.name} × ${item.quantity}</div>
+                                <div style="font-size: 12px; color: var(--gray);">₱${item.price} each</div>
+                            </div>
+                            <div style="font-weight: bold; color: var(--dark);">
+                                ₱${item.total}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            reviewOrderItems.innerHTML = html;
+            document.getElementById('reviewOrderTotal').textContent = `₱${total}`;
+            
+            // Show special notes if any
+            const specialNotesContainer = document.getElementById('specialNotesContainer');
+            const reviewSpecialNotes = document.getElementById('reviewSpecialNotes');
+            
+            if (currentSpecialRequests && currentSpecialRequests.trim() !== '') {
+                specialNotesContainer.style.display = 'block';
+                reviewSpecialNotes.textContent = currentSpecialRequests;
+            } else {
+                specialNotesContainer.style.display = 'none';
+            }
+            
+            // Open the review modal
+            openModal('orderReviewModal');
+        }
+
+        // FIXED: When "Edit Order" is clicked, go back to menu without losing items
+        function editOrderFromReview() {
+            closeModal('orderReviewModal');
+            // Go back to menu without clearing the order
+            showMenuSection();
+            refreshAllMenuItems(); // Refresh to show current quantities
+        }
+
+        // FIXED: Send order to kitchen
+        async function sendToKitchen() {
+            if (currentOrder.length === 0) {
+                alert('No items in the order');
+                return;
+            }
+            
+            const total = currentOrder.reduce((sum, item) => sum + item.total, 0);
+            const totalItems = currentOrder.reduce((sum, item) => sum + item.quantity, 0);
+            
+            try {
+                const orderData = {
+                    table: currentTable.table_number,
+                    items: currentOrder.map(item => ({
+                        dish: item.name,
+                        qty: item.quantity,
+                        price: item.price
+                    })),
+                    total: total,
+                    specialRequests: currentSpecialRequests,
+                    customer_count: currentTable.customers || selectedCustomers
+                };
+                
+                console.log('Sending order to server:', orderData);
+                
+                const response = await fetch('/api/orders', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(orderData)
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Server error: ${response.status} - ${errorText}`);
+                }
+                
+                const result = await response.json();
+                console.log('Server response:', result);
+                
+                if (result.success) {
+                    // Update table status locally
+                    if (currentTable) {
+                        currentTable.status = 'occupied';
+                        currentTable.occupied_since = new Date().toISOString();
+                        loadTables();
+                    }
+                    
+                    // Show success notification
+                    showKitchenNotification();
+                    
+                    // Close the review modal
+                    closeModal('orderReviewModal');
+                    
+                    // Clear order AFTER successful send
+                    currentOrder = [];
+                    currentSpecialRequests = '';
+                    itemQuantities = {};
+                    updateOrderBadge();
+                    refreshAllMenuItems();
+                    
+                    document.getElementById('viewOrderBtn').style.display = 'none';
+                    
+                    // Show success message and return to tables
+                    setTimeout(() => {
+                        alert(`✅ Order sent to kitchen successfully!\n\nTable: ${currentTable.table_number}\nCustomers: ${orderData.customer_count}\nTotal Items: ${totalItems}\nTotal Amount: ₱${total}\n\nThe kitchen will start preparing your order.`);
+                        showTablesSection();
+                    }, 1500);
+                } else {
+                    alert('Error: ' + (result.message || 'Failed to send order'));
+                }
+                
+            } catch (error) {
+                console.error('Error sending order:', error);
+                alert('Error sending order to kitchen: ' + error.message);
+            }
+        }
+
+        // FIXED: Show kitchen notification
+        function showKitchenNotification() {
+            const notification = document.createElement('div');
+            notification.className = 'kitchen-notification';
+            notification.innerHTML = `
+                <i class="fas fa-check-circle" style="font-size: 24px;"></i>
+                <div>
+                    <div style="font-weight: bold;">Order Sent to Kitchen!</div>
+                    <div style="font-size: 14px; opacity: 0.9;">Table ${currentTable.table_number} • ${currentOrder.reduce((sum, item) => sum + item.quantity, 0)} items</div>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.5s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 500);
+            }, 3000);
+        }
+
+        // Add more items to existing order
+        function addMoreItems() {
+            closeModal('occupiedTableModal');
+            showMenuSection();
+        }
+
+        // Request bill for occupied table
+        async function requestBill() {
+            if (!currentTable) return;
+            
+            const splitOption = document.getElementById('splitOption').value;
+            const cashierNotes = document.getElementById('cashierNotes').value;
+            
+            try {
+                const response = await fetch('/api/orders');
+                const orders = await response.json();
+                
+                const tableOrder = orders.find(order => 
+                    (order.table_number || order.table) == currentTable.table_number && 
+                    ['pending', 'preparing', 'served'].includes(order.status)
+                );
+                
+                if (!tableOrder) {
+                    alert('No active order found for this table');
+                    return;
+                }
+                
+                // ✅ FIX: This is what triggers cashier notification
+                // Set bill_requested = 1, status remains 'served'
+                const updateResponse = await fetch(`/api/orders/${tableOrder.id}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        status: 'served',  // Keep as served
+                        bill_requested: 1,  // THIS tells cashier to show this bill
+                        cashier_notes: cashierNotes
+                    })
+                });
+                
+                const result = await updateResponse.json();
+                
+                if (result.success) {
+                    alert(`✅ Bill requested for Table ${currentTable.table_number}!\nCashier has been notified.`);
+                    
+                    // Don't clear table yet - only after payment
+                    // Table remains occupied until cashier processes payment
+                    
+                    closeModal('billRequestModal');
+                } else {
+                    alert('Error requesting bill: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error sending to cashier:', error);
+                alert('Error requesting bill');
+            }
+        }
+
+        // Send bill to cashier
+        async function sendToCashier() {
+            if (!currentTable) return;
+            
+            const splitOption = document.getElementById('splitOption').value;
+            const cashierNotes = document.getElementById('cashierNotes').value;
+            
+            try {
+                const response = await fetch('/api/orders');
+                const orders = await response.json();
+                
+                const tableOrder = orders.find(order => 
+                    (order.table_number || order.table) == currentTable.table_number && 
+                    ['pending', 'preparing', 'served'].includes(order.status)
+                );
+                
+                if (!tableOrder) {
+                    alert('No active order found for this table');
+                    return;
+                }
+                
+                const updateResponse = await fetch(`/api/orders/${tableOrder.id}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        status: 'served',
+                        bill_requested: true,
+                        cashier_notes: cashierNotes
+                    })
+                });
+                
+                const result = await updateResponse.json();
+                
+                if (result.success) {
+                    alert(`✅ Bill requested for Table ${currentTable.table_number}!\nCashier has been notified.`);
+                    
+                    currentTable.status = 'available';
+                    currentTable.occupied_since = null;
+                    loadTables();
+                    
+                    closeModal('billRequestModal');
+                } else {
+                    alert('Error requesting bill: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error sending to cashier:', error);
+                alert('Error requesting bill');
+            }
+        }
+
+        // Clear table (for special cases only)
+        function clearTable() {
+            if (currentTable) {
+                if (confirm(`Clear Table ${currentTable.table_number}? This will mark the table as available immediately (use only if no bill needed).`)) {
+                    fetch(`/api/tables/${currentTable.table_number}/status`, {
+                        method: 'PUT',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ status: 'available' })
+                    });
+                    
+                    currentTable.status = 'available';
+                    currentTable.occupied_since = null;
+                    
+                    closeModal('occupiedTableModal');
+                    loadTables();
+                    
+                    alert(`✅ Table ${currentTable.table_number} has been cleared.`);
+                }
+            }
+        }
+
+        // Show tables section
+        function showTablesSection() {
+            document.getElementById('tablesSection').style.display = 'block';
+            document.getElementById('menuSection').style.display = 'none';
+            
+            // START AUTO-REFRESH (5 seconds)
+            startAutoRefresh();
+            
+            // Ensure table times are updating
+            startTableTimesUpdate();
+            
+            currentOrder = [];
+            itemQuantities = {};
+            updateOrderBadge();
+            refreshAllMenuItems();
+            
+            loadTables();
+        }
+
+        // Show menu section
+        function showMenuSection() {
+            document.getElementById('tablesSection').style.display = 'none';
+            document.getElementById('menuSection').style.display = 'block';
+            
+            // STOP AUTO-REFRESH when not on tables
+            stopAutoRefresh();
+            
+            if (currentOrder.length > 0) {
+                document.getElementById('viewOrderBtn').style.display = 'flex';
+            }
+            
+            showCategoriesPage();
+        }
+
+        // Show categories page
+        function showCategoriesPage() {
+            document.querySelectorAll('.menu-items-page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById('categoriesPage').style.display = 'block';
+        }
+
+        // Back to tables from menu
+        function backToTables() {
+            if (currentOrder.length > 0) {
+                if (confirm('You have items in your order. Go back to tables without sending order?')) {
+                    showTablesSection();
+                }
+            } else {
+                showTablesSection();
+            }
+        }
+
+        // Show profile modal
+        function showProfile() {
+            openModal('profileModal');
+        }
+
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Show error message
+        function showError(message) {
+            alert('Error: ' + message);
+        }
+
+        // Logout
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = '/logout';
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            document.getElementById('customerCount').addEventListener('input', function(e) {
+                selectCustomers(parseInt(e.target.value) || 1);
+            });
+            
+            selectCustomers(4);
+        }
+
+        // Auto-refresh menu items every 30 seconds
+        setInterval(() => {
+            if (document.getElementById('menuSection').style.display !== 'none') {
+                loadAllMenuItemsFromServer();
+            }
+        }, 30000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chef Dashboard - Restaurant Pro</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #4067ac 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .header-left h1 {
+            font-size: 28px;
+            color: #0e335c;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .chef-icon {
+            font-size: 36px;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        .new-orders-badge {
+            background: #e74c3c;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .time-display {
+            font-size: 18px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .refresh-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .refresh-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+        
+        /* Stats Bar */
+        .stats-bar {
+            background: white;
+            margin: 20px 30px;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-3px);
+        }
+        
+        .stat-item.pending {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+            color: white;
+        }
+        
+        .stat-item.cooking {
+            background: linear-gradient(135deg, #ffd93d 0%, #ffc107 100%);
+            color: #333;
+        }
+        
+        .stat-item.done {
+            background: linear-gradient(135deg, #6bcf7f 0%, #4caf50 100%);
+            color: white;
+        }
+        
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        
+        /* Kanban Board */
+        .kanban-board {
+            padding: 20px 30px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            min-height: calc(100vh - 250px);
+        }
+        
+        .kanban-column {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .column-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid;
+        }
+        
+        .column-header.pending { border-color: #e74c3c; }
+        .column-header.cooking { border-color: #f39c12; }
+        .column-header.done { border-color: #27ae60; }
+        
+        .column-title {
+            font-size: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .column-title.pending { color: #e74c3c; }
+        .column-title.cooking { color: #f39c12; }
+        .column-title.done { color: #27ae60; }
+        
+        .column-count {
+            background: #ecf0f1;
+            color: #2c3e50;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        /* Order Cards */
+        .orders-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: calc(100vh - 400px);
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        
+        .orders-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .orders-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .orders-container::-webkit-scrollbar-thumb {
+            background: #bdc3c7;
+            border-radius: 10px;
+        }
+        
+        .order-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            border-left: 5px solid;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .order-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+        
+        .order-card.urgent {
+            border-left-color: #e74c3c;
+            animation: shake 0.5s infinite;
+        }
+        
+        .order-card.warning {
+            border-left-color: #f39c12;
+        }
+        
+        .order-card.normal {
+            border-left-color: #3498db;
+        }
+        
+        .order-card.cooking {
+            border-left-color: #f39c12;
+        }
+        
+        .order-card.done {
+            border-left-color: #27ae60;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .order-table {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .order-time {
+            text-align: right;
+        }
+        
+        .time-elapsed {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .time-elapsed.urgent { color: #e74c3c; }
+        .time-elapsed.warning { color: #f39c12; }
+        .time-elapsed.normal { color: #27ae60; }
+        
+        .time-label {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .order-waiter {
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .order-items {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .order-items h4 {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        .item-list {
+            list-style: none;
+        }
+        
+        .item-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+            font-size: 15px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .item-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .item-qty {
+            background: #3498db;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        
+        .special-note {
+            background: #fff3cd;
+            border-left: 3px solid #ffc107;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 13px;
+            color: #856404;
+        }
+        
+        .order-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-start {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+        }
+        
+        .btn-done {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #95a5a6;
+        }
+        
+        .empty-state i {
+            font-size: 60px;
+            margin-bottom: 15px;
+            opacity: 0.3;
+        }
+        
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        
+        .empty-state p {
+            font-size: 14px;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            .kanban-board {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-bar {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .stats-bar {
+                grid-template-columns: 1fr;
+                margin: 15px;
+            }
+            
+            .kanban-board {
+                padding: 15px;
+            }
+            
+            .header-left h1 {
+                font-size: 22px;
+            }
+        }
+        
+        /* Loading animation */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #95a5a6;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <h1>
+                <span class="chef-icon">👨‍🍳</span>
+                Kitchen Dashboard
+            </h1>
+            <div class="new-orders-badge" id="newOrdersBadge" style="display: none;">
+                🔔 <span id="newOrdersCount">0</span> New!
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="time-display" id="timeDisplay">Loading...</div>
+            <button class="refresh-btn" onclick="loadOrders()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </div>
+    
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+        <div class="stat-item pending">
+            <div class="stat-number" id="pendingCount">0</div>
+            <div class="stat-label">🔴 Pending Orders</div>
+        </div>
+        <div class="stat-item cooking">
+            <div class="stat-number" id="cookingCount">0</div>
+            <div class="stat-label">🟡 Cooking Now</div>
+        </div>
+        <div class="stat-item done">
+            <div class="stat-number" id="doneCount">0</div>
+            <div class="stat-label">🟢 Ready to Serve</div>
+        </div>
+    </div>
+    
+    <!-- Kanban Board -->
+    <div class="kanban-board">
+        <!-- Pending Column -->
+        <div class="kanban-column">
+            <div class="column-header pending">
+                <div class="column-title pending">
+                    <i class="fas fa-clock"></i>
+                    PENDING
+                </div>
+                <div class="column-count" id="pendingColumnCount">0</div>
+            </div>
+            <div class="orders-container" id="pendingOrders">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading orders...
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cooking Column -->
+        <div class="kanban-column">
+            <div class="column-header cooking">
+                <div class="column-title cooking">
+                    <i class="fas fa-fire"></i>
+                    COOKING
+                </div>
+                <div class="column-count" id="cookingColumnCount">0</div>
+            </div>
+            <div class="orders-container" id="cookingOrders">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading orders...
+                </div>
+            </div>
+        </div>
+        
+        <!-- Done Column -->
+        <div class="kanban-column">
+            <div class="column-header done">
+                <div class="column-title done">
+                    <i class="fas fa-check-circle"></i>
+                    DONE
+                </div>
+                <div class="column-count" id="doneColumnCount">0</div>
+            </div>
+            <div class="orders-container" id="doneOrders">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading orders...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let orders = [];
+        let lastOrderCount = 0;
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateTime();
+            setInterval(updateTime, 1000);
+            loadOrders();
+            
+            // Auto-refresh every 10 seconds
+            setInterval(loadOrders, 10000);
+        });
+        
+        // Update time display
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            const dateString = now.toLocaleDateString('en-US', {
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+            document.getElementById('timeDisplay').textContent = `${dateString} ${timeString}`;
+        }
+        
+        // Calculate time elapsed
+        function getTimeElapsed(timestamp) {
+            const now = new Date();
+            const orderTime = new Date(timestamp);
+            const diffMs = now - orderTime;
+            const diffMins = Math.floor(diffMs / 60000);
+            
+            if (diffMins < 1) return { text: 'Just now', class: 'normal' };
+            if (diffMins === 1) return { text: '1 min ago', class: 'normal' };
+            if (diffMins < 5) return { text: `${diffMins} mins ago`, class: 'normal' };
+            if (diffMins < 10) return { text: `${diffMins} mins ago`, class: 'warning' };
+            return { text: `${diffMins} mins ago`, class: 'urgent' };
+        }
+        
+        // Load orders from API
+        async function loadOrders() {
+            try {
+                console.log('Chef: Loading orders from /api/orders...');
+                const response = await fetch('/api/orders');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const fetchedOrders = await response.json();
+                console.log('Chef: Received', fetchedOrders.length, 'orders');
+                
+                // DEBUG: Log all statuses
+                fetchedOrders.forEach(order => {
+                    console.log(`Order ${order.id}: Status=${order.status}, Table=${order.table_number || order.table}, Date=${order.timestamp || order.order_date}`);
+                });
+                
+                // Store orders
+                orders = fetchedOrders;
+                
+                // Check for new orders
+                if (orders.length > lastOrderCount) {
+                    const newCount = orders.length - lastOrderCount;
+                    showNewOrdersNotification(newCount);
+                    playNotificationSound('new');
+                }
+                lastOrderCount = orders.length;
+                
+                renderOrders();
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                showError('Failed to load orders. Please refresh.');
+            }
+        }
+        
+        // Show new orders notification
+        function showNewOrdersNotification(count) {
+            const badge = document.getElementById('newOrdersBadge');
+            const countSpan = document.getElementById('newOrdersCount');
+            countSpan.textContent = count;
+            badge.style.display = 'flex';
+            badge.style.animation = 'pulse 1s 3';
+            
+            setTimeout(() => {
+                badge.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Play notification sound
+        function playNotificationSound(type) {
+            try {
+                let soundUrl;
+                if (type === 'new') {
+                    soundUrl = 'https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.mp3';
+                } else if (type === 'done') {
+                    soundUrl = 'https://assets.mixkit.co/sfx/preview/mixkit-kitchen-timer-1006.mp3';
+                }
+                
+                if (soundUrl) {
+                    const audio = new Audio(soundUrl);
+                    audio.volume = 0.3;
+                    audio.play();
+                }
+            } catch (error) {
+                console.log('Sound not available');
+            }
+        }
+        
+        // Show notification toast
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                background: ${type === 'success' ? '#2ecc71' : type === 'error' ? '#e74c3c' : '#3498db'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 10px;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                z-index: 1000;
+                animation: slideInRight 0.3s ease;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+        
+        // Render orders to columns
+        function renderOrders() {
+            console.log('=== RENDER ORDERS ===');
+            console.log('Total orders:', orders.length);
+            
+            // Get today's date
+            const today = new Date();
+            const todayDateString = today.toISOString().split('T')[0];
+            console.log('Today date:', todayDateString);
+            
+            // Filter orders by status
+            const pendingOrders = orders.filter(o => o.status === 'pending');
+            const cookingOrders = orders.filter(o => o.status === 'preparing');
+            
+            // Filter done orders - ONLY TODAY'S served/completed orders
+            const doneOrders = orders.filter(o => {
+                if (o.status === 'served' || o.status === 'completed') {
+                    // Get order date
+                    const orderDate = new Date(o.timestamp || o.order_date);
+                    const orderDateString = orderDate.toISOString().split('T')[0];
+                    console.log(`Order ${o.id}: status=${o.status}, orderDate=${orderDateString}, today=${todayDateString}, match=${orderDateString === todayDateString}`);
+                    return orderDateString === todayDateString;
+                }
+                return false;
+            });
+            
+            console.log('Pending:', pendingOrders.length, 'Cooking:', cookingOrders.length, 'Done:', doneOrders.length);
+            console.log('Done orders IDs:', doneOrders.map(o => o.id));
+            
+            // Update stats
+            document.getElementById('pendingCount').textContent = pendingOrders.length;
+            document.getElementById('cookingCount').textContent = cookingOrders.length;
+            document.getElementById('doneCount').textContent = doneOrders.length;
+            
+            // Update column counts
+            document.getElementById('pendingColumnCount').textContent = pendingOrders.length;
+            document.getElementById('cookingColumnCount').textContent = cookingOrders.length;
+            document.getElementById('doneColumnCount').textContent = doneOrders.length;
+            
+            // Render each column
+            renderColumn('pendingOrders', pendingOrders, 'pending');
+            renderColumn('cookingOrders', cookingOrders, 'cooking');
+            renderColumn('doneOrders', doneOrders, 'done');
+        }
+        
+        // Render a specific column
+        function renderColumn(containerId, ordersList, status) {
+            const container = document.getElementById(containerId);
+            
+            if (ordersList.length === 0) {
+                const emptyMessages = {
+                    pending: { icon: 'clock', title: 'No Pending Orders', text: 'All caught up!' },
+                    cooking: { icon: 'fire', title: 'Nothing Cooking', text: 'Start cooking pending orders' },
+                    done: { icon: 'check-circle', title: 'No Ready Orders', text: 'Ready orders will appear here' }
+                };
+                
+                const msg = emptyMessages[status];
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-${msg.icon}"></i>
+                        <h3>${msg.title}</h3>
+                        <p>${msg.text}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Sort by timestamp
+            if (status === 'done') {
+                ordersList.sort((a, b) => new Date(b.timestamp || b.order_date) - new Date(a.timestamp || a.order_date));
+            } else {
+                ordersList.sort((a, b) => new Date(a.timestamp || a.order_date) - new Date(b.timestamp || b.order_date));
+            }
+            
+            container.innerHTML = ordersList.map(order => createOrderCard(order, status)).join('');
+        }
+        
+        // Create order card HTML
+        function createOrderCard(order, status) {
+            const timeElapsed = getTimeElapsed(order.timestamp || order.order_date);
+            const urgencyClass = status === 'pending' ? timeElapsed.class : status;
+            
+            // Format items
+            let itemsHTML = '';
+            if (Array.isArray(order.items)) {
+                itemsHTML = order.items.map(item => {
+                    if (typeof item === 'string') {
+                        return `<li><span class="item-qty">1x</span> ${item}</li>`;
+                    } else if (typeof item === 'object') {
+                        return `<li><span class="item-qty">${item.qty || 1}x</span> ${item.dish || item.name || 'Unknown Item'}</li>`;
+                    }
+                    return `<li>${item}</li>`;
+                }).join('');
+            } else if (typeof order.items === 'string') {
+                try {
+                    const parsedItems = JSON.parse(order.items);
+                    if (Array.isArray(parsedItems)) {
+                        itemsHTML = parsedItems.map(item => {
+                            if (typeof item === 'object') {
+                                return `<li><span class="item-qty">${item.qty || 1}x</span> ${item.dish || item.name || 'Unknown Item'}</li>`;
+                            }
+                            return `<li><span class="item-qty">1x</span> ${item}</li>`;
+                        }).join('');
+                    } else {
+                        itemsHTML = `<li>${order.items}</li>`;
+                    }
+                } catch (e) {
+                    itemsHTML = `<li>${order.items}</li>`;
+                }
+            }
+            
+            // Special notes
+            const specialNotes = order.special_requests || order.specialRequests || '';
+            
+            // Action buttons
+            let actionsHTML = '';
+            if (status === 'pending') {
+                actionsHTML = `
+                    <div class="order-actions">
+                        <button class="action-btn btn-start" onclick="startCooking(${order.id})">
+                            <i class="fas fa-fire"></i> Start Cooking
+                        </button>
+                    </div>
+                `;
+            } else if (status === 'cooking') {
+                actionsHTML = `
+                    <div class="order-actions">
+                        <button class="action-btn btn-done" onclick="markAsDone(${order.id})">
+                            <i class="fas fa-check"></i> Mark as Ready
+                        </button>
+                    </div>
+                `;
+            }
+            
+            // Format time
+            let displayTime = 'N/A';
+            if (order.timestamp || order.order_date) {
+                const date = new Date(order.timestamp || order.order_date);
+                displayTime = date.toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+            }
+            
+            return `
+                <div class="order-card ${urgencyClass}">
+                    <div class="order-header">
+                        <div class="order-table">
+                            🍽️ Table ${order.table_number || order.table || 'Unknown'}
+                        </div>
+                        <div class="order-time">
+                            <div class="time-elapsed ${timeElapsed.class}">
+                                ${timeElapsed.text}
+                            </div>
+                            <div class="time-label">
+                                ${displayTime}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="order-waiter">
+                        <i class="fas fa-user"></i>
+                        Waiter: <strong>${order.waiter_name || order.waiter || 'Unknown'}</strong>
+                    </div>
+                    
+                    <div class="order-items">
+                        <h4><i class="fas fa-utensils"></i> Order Items (${order.items ? (Array.isArray(order.items) ? order.items.length : 1) : 0})</h4>
+                        <ul class="item-list">
+                            ${itemsHTML}
+                        </ul>
+                    </div>
+                    
+                    ${specialNotes ? `
+                        <div class="special-note">
+                            <strong><i class="fas fa-exclamation-circle"></i> Special Instructions:</strong><br>
+                            ${specialNotes}
+                        </div>
+                    ` : ''}
+                    
+                    <div class="order-total" style="margin-top: 10px; text-align: right; font-weight: bold; color: #2c3e50;">
+                        Total: ₱${order.total || '0.00'}
+                    </div>
+                    
+                    ${actionsHTML}
+                </div>
+            `;
+        }
+        
+        // Start cooking an order - FIXED
+        async function startCooking(orderId) {
+            try {
+                console.log(`Chef: Starting cooking for order ${orderId}...`);
+                
+                const response = await fetch(`/api/orders/${orderId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status: 'preparing' })
+                });
+                
+                const result = await response.json();
+                console.log('Chef: Update response:', result);
+                
+                if (result.success) {
+                    showNotification(`🔥 Order #${orderId} moved to cooking!`, 'success');
+                    
+                    // Update local order immediately
+                    const orderIndex = orders.findIndex(o => o.id === orderId);
+                    if (orderIndex !== -1) {
+                        orders[orderIndex].status = 'preparing';
+                        console.log(`Updated local order ${orderId} to: preparing`);
+                    }
+                    
+                    // Re-render immediately
+                    renderOrders();
+                    
+                    // Reload from server after delay
+                    setTimeout(() => loadOrders(), 1000);
+                } else {
+                    showNotification(`❌ ${result.message || 'Failed to update order'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error updating order:', error);
+                showNotification('❌ Error updating order', 'error');
+            }
+        }
+        
+        // Mark order as done (ready to serve) - FIXED
+        async function markAsDone(orderId) {
+            try {
+                console.log(`Chef: Marking order ${orderId} as ready...`);
+                
+                const response = await fetch(`/api/orders/${orderId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status: 'served' })
+                });
+                
+                const result = await response.json();
+                console.log('Chef: Update response:', result);
+                
+                if (result.success) {
+                    showNotification(`✅ Order #${orderId} is ready to serve!`, 'success');
+                    playNotificationSound('done');
+                    
+                    // Update local order immediately
+                    const orderIndex = orders.findIndex(o => o.id === orderId);
+                    if (orderIndex !== -1) {
+                        orders[orderIndex].status = 'served';
+                        console.log(`Updated local order ${orderId} to: served`);
+                    }
+                    
+                    // Re-render immediately
+                    renderOrders();
+                    
+                    // Reload from server after delay
+                    setTimeout(() => loadOrders(), 1000);
+                } else {
+                    showNotification(`❌ ${result.message || 'Failed to update order'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error updating order:', error);
+                showNotification('❌ Error updating order', 'error');
+            }
+        }
+        
+        // Show error
+        function showError(message) {
+            const containers = ['pendingOrders', 'cookingOrders', 'doneOrders'];
+            containers.forEach(id => {
+                const container = document.getElementById(id);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle" style="color: #e74c3c;"></i>
+                        <h3>Error Loading Orders</h3>
+                        <p>${message}</p>
+                        <button onclick="loadOrders()" style="margin-top: 10px; padding: 8px 16px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                            <i class="fas fa-sync-alt"></i> Retry
+                        </button>
+                    </div>
+                `;
+            });
+        }
+        
+        // Logout
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = '/logout';
+            }
+        }
+        
+        // Add CSS for notifications
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideOutRight {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

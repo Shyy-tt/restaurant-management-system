@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Restaurant Pro - Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: url('/static/images/bg1.png') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: rgba(84, 86, 67, 0.674);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 460px;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 5px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .logo-icon {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 0px;
+            width: 100%;
+        }
+
+        .logo-icon img {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            max-height: 200px;
+            object-fit: contain;
+        }
+        
+        .logo h1 {
+            color: #ffffff;
+            margin-bottom: 5px;
+            font-size: 40px;
+            font-family: 'Georgia', serif;
+            font-style: italic;
+        }
+        
+        .logo p {
+            color: #c8d1d2;
+            font-size: 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #f8f9fa;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 14px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+        
+        .input-group input:focus,
+        .input-group select:focus {
+            border-color: #667eea;
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+        
+        .input-group input::placeholder {
+            color: #bbb;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .login-btn:active {
+            transform: translateY(0);
+        }
+        
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .demo-info {
+            margin-top: 25px;
+            padding: 18px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 8px;
+            text-align: left;
+            font-size: 13px;
+            color: #495057;
+            border-left: 4px solid #667eea;
+        }
+        
+        .demo-info strong {
+            display: block;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+        
+        .demo-account {
+            background: white;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .demo-account:hover {
+            background: #f8f9fa;
+            transform: translateX(5px);
+        }
+        
+        .demo-account code {
+            color: #667eea;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .message {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .error-message {
+            background: #fee;
+            color: #c00;
+            border: 1px solid #fcc;
+        }
+        
+        .success-message {
+            background: #dfd;
+            color: #080;
+            border: 1px solid #bfb;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 43px;
+            cursor: pointer;
+            font-size: 20px;
+            user-select: none;
+        }
+        
+        .role-icon {
+            font-size: 18px;
+            margin-right: 8px;
+        }
+        
+        select option {
+            padding: 10px;
+        }
+
+        /* For mobile devices */
+        @media (max-width: 768px) {
+            .logo-icon img {
+                max-width: 300px;
+                max-height: 150px;
+            }
+            
+            .logo h1 {
+                font-size: 32px;
+            }
+            
+            .logo p {
+                font-size: 18px;
+            }
+            
+            .login-container {
+                padding: 20px;
+                margin: 10px;
+            }
+        }
+
+        /* For very small phones */
+        @media (max-width: 480px) {
+            .logo-icon img {
+                max-width: 250px;
+                max-height: 120px;
+            }
+            
+            .logo h1 {
+                font-size: 28px;
+            }
+            
+            .logo p {
+                font-size: 16px;
+            }
+            
+            .login-container {
+                padding: 15px;
+                margin: 5px;
+            }
+            
+            body {
+                padding: 10px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <div class="logo-icon">
+                <img src="/static/images/logo.png" alt="Logo">
+            </div>
+            <h1>Mabuhay!!</h1>
+            <p>Staff Login Portal</p>
+        </div>
+        
+        <div id="errorMessage" class="message error-message"></div>
+        <div id="successMessage" class="message success-message"></div>
+        
+        <form id="loginForm">
+            <div class="input-group">
+                <label for="username"><span class="role-icon">👤</span> Username</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    placeholder="Enter your username" 
+                    required
+                    autocomplete="username"
+                >
+            </div>
+            
+            <div class="input-group">
+                <label for="password"><span class="role-icon">🔑</span> Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    placeholder="Enter your password" 
+                    required
+                    autocomplete="current-password"
+                >
+                <span class="password-toggle" onclick="togglePassword()">🙉</span>
+            </div>
+            
+            <div class="input-group">
+                <label for="role"><span class="role-icon">👥</span> Select Role</label>
+                <select id="role" required>
+                    <option value="">-- Select Your Role --</option>
+                    <option value="manager">👔 Manager</option>
+                    <option value="chef">👨‍🍳 Chef</option>
+                    <option value="cashier">💰 Cashier</option>
+                    <option value="waiter">👨‍💼 Waiter</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="login-btn" id="loginBtn">
+                <span>📊</span> Login to Dashboard
+            </button>
+        </form>
+        
+        <div class="demo-info">
+            <strong>📌 Demo Accounts (Click to Auto-fill):</strong>
+            <div class="demo-account" onclick="fillDemo('manager')">
+                👔 <strong>Manager:</strong> <code>manager</code> / <code>admin123</code>
+            </div>
+            <div class="demo-account" onclick="fillDemo('chef')">
+                👨‍🍳 <strong>Chef:</strong> <code>chef</code> / <code>chef123</code>
+            </div>
+            <div class="demo-account" onclick="fillDemo('cashier')">
+                💰 <strong>Cashier:</strong> <code>cashier</code> / <code>cashier123</code>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle password visibility
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggle = document.querySelector('.password-toggle');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggle.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggle.textContent = '🙉';
+            }
+        }
+        
+        // Show message function
+        function showMessage(type, text) {
+            const errorMsg = document.getElementById('errorMessage');
+            const successMsg = document.getElementById('successMessage');
+            
+            // Hide both first
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+            
+            if (type === 'error') {
+                errorMsg.textContent = text;
+                errorMsg.style.display = 'block';
+            } else if (type === 'success') {
+                successMsg.textContent = text;
+                successMsg.style.display = 'block';
+            }
+        }
+        
+        // Auto-fill demo accounts
+        function fillDemo(role) {
+            const demos = {
+                'manager': {username: 'manager', password: 'admin123'},
+                'chef': {username: 'chef', password: 'chef123'},
+                'cashier': {username: 'cashier', password: 'cashier123'}
+            };
+            
+            const demo = demos[role];
+            if (demo) {
+                document.getElementById('username').value = demo.username;
+                document.getElementById('password').value = demo.password;
+                document.getElementById('role').value = role;
+                
+                // Show success message
+                showMessage('success', `Demo ${role} credentials filled! Click Login.`);
+            }
+        }
+        
+        // Handle form submission
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
+            const btn = document.getElementById('loginBtn');
+            
+            // Validate inputs
+            if (!username || !password || !role) {
+                showMessage('error', 'Please fill in all fields!');
+                return;
+            }
+            
+            // Show loading state
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading-spinner"></span> Logging in...';
+            
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password,
+                        role: role  // Send role to server
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage('success', '✓ ' + result.message);
+                    
+                    // Redirect after 1 second
+                    setTimeout(() => {
+                        window.location.href = result.redirect;
+                    }, 1000);
+                } else {
+                    showMessage('error', '✗ ' + result.message);
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>📊</span> Login to Dashboard';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showMessage('error', '✗ Connection error! Make sure the server is running.');
+                btn.disabled = false;
+                btn.innerHTML = '<span>📊</span> Login to Dashboard';
+            }
+        });
+        
+        // Enter key support
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+            }
+        });
+        
+        // Auto-fill manager demo on page load for convenience
+        window.addEventListener('load', function() {
+            // You can remove this if you don't want auto-fill on load
+            // fillDemo('manager');
+        });
+    </script>
+</body>
+</html>
