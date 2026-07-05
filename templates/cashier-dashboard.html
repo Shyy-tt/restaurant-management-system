@@ -994,7 +994,7 @@
         }
     }
 
-    // Load pending orders from server - FIXED VERSION
+    // Load pending orders from server
     async function loadPendingOrders() {
         try {
             console.log('Cashier: Fetching pending bills...');
@@ -1058,7 +1058,7 @@
         }
     }
 
-    // Update notification panel - FIXED VERSION
+    // Update notification panel
     function updateNotificationPanel() {
         const notificationList = document.getElementById('notificationList');
         
@@ -1129,7 +1129,7 @@
         }, 3000);
     }
 
-    // Select order from notification - FIXED VERSION
+    // Select order from notification
     async function selectOrderFromNotification(orderId) {
         try {
             console.log('Cashier: Loading order details for ID:', orderId);
@@ -1366,7 +1366,7 @@
         }
     }
 
-    // ✅ CRITICAL FIX: Confirm payment - NOW properly updates sales
+    // Confirm payment
     async function confirmPayment() {
         if (!currentOrder) {
             alert('No order selected!');
@@ -1396,7 +1396,7 @@
             
             const tableNumber = currentOrder.table_number || currentOrder.table || currentOrder.tableNumber || 'Unknown';
             
-            // ✅ This will now properly update order_count and sales statistics
+            
             console.log('Cashier: Processing payment for order:', orderId);
             const response = await fetch(`/api/cashier/process-payment/${orderId}`, {
                 method: 'POST',
@@ -1429,30 +1429,23 @@
                 document.getElementById('successMessage').textContent = message;
                 document.getElementById('successModal').classList.add('active');
                 
-                // ✅ IMMEDIATELY REMOVE FROM LOCAL NOTIFICATIONS
                 pendingOrders = pendingOrders.filter(o => o.id != orderId);
                 currentOrder = null;
                 
-                // ✅ IMMEDIATELY UPDATE NOTIFICATION BADGE
                 updateNotificationBadge();
                 
-                // ✅ IMMEDIATELY UPDATE NOTIFICATION PANEL (if open)
                 if (notificationPanelOpen) {
                     updateNotificationPanel();
                 }
                 
-                // ✅ RESET DASHBOARD IMMEDIATELY
                 resetDashboard();
                 
-                // ✅ SHOW SUCCESS TOAST
                 showToast('Payment processed successfully! Sales updated.', 'success');
                 
-                // ✅ AUTO-CLOSE SUCCESS MODAL AFTER 2 SECONDS
                 setTimeout(() => {
                     closeSuccessModal();
                 }, 2000);
                 
-                // ✅ REFRESH PENDING ORDERS FROM SERVER
                 setTimeout(() => {
                     loadPendingOrders();
                 }, 1000);
