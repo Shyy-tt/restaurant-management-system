@@ -89,7 +89,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // ✅ FIXED: WebChromeClient with proper file chooser handling
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public boolean onShowFileChooser(WebView webView,
@@ -189,7 +188,6 @@ public class MainActivity extends AppCompatActivity {
         webView.loadUrl(serverUrl);
     }
 
-    // ✅ FIXED: Show image chooser with proper options
     private void showImageChooser() {
         Log.d(TAG, "showImageChooser");
 
@@ -398,7 +396,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // ✅ FIXED: Handle activity result properly
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -462,7 +459,6 @@ public class MainActivity extends AppCompatActivity {
                 Log.w(TAG, "Unknown result code: " + resultCode);
             }
 
-            // ✅ CRITICAL: Always call the callback
             if (filePathCallback != null) {
                 filePathCallback.onReceiveValue(results);
                 filePathCallback = null;
@@ -471,7 +467,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // Inject JavaScript for debugging (FIXED: No text blocks for Java 8)
     private void injectDebugJavaScript() {
         String js = "javascript:" +
                 "try {" +
